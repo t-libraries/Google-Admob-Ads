@@ -110,6 +110,18 @@ This Kotlin-powered Android library lets you load all major ad types—Native, B
 ## Banner Native 
 <img src="./images/banner.png" alt="Banner Native Ad Displaying">
 
+## Small Native / Adaptive Native
+<img src="./images/small.png" alt="Adaptive or Small Native Ad Displaying">
+
+## Medium Native
+<img src="./images/medium.png" alt="Medium Native Ad Displaying">
+
+## Large Native
+<img src="./images/large.png" alt="Large Native Ad Displaying">
+
+## Large Native 1
+<img src="./images/large_1.png" alt="Large Native 1 Ad Displaying">
+
 ### Third-party licenses
 
 This software uses following technologies with great appreciation:
