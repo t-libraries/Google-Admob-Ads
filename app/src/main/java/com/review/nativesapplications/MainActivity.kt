@@ -31,10 +31,11 @@ class MainActivity : AppCompatActivity() {
         AdmobNativeAd(
             this,
             binding.nativeAd,
-            "ca-app-pub-3940256099942544/1044960115",
-            "large",
+            "/21775744923/example/native-video",
+            "large_1",
             "#008000"
         )
+            .setSkeltonColor(R.color.black_i)
             .load()
     }
 }
