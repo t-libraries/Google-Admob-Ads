@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
             this,
             binding.nativeAd,
             "/21775744923/example/native-video",
-            "large_1",
+            "large",
             "#008000"
         )
             .load()
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
             this,
             binding.nativeAd,
             "/21775744923/example/native-video",
-            "large_1",
+            "large",
             "#008000"
         )
             .load();
@@ -104,6 +104,11 @@ public class MainActivity extends AppCompatActivity {
 
 ## Say goodbye to complex ad integrations!
 This Kotlin-powered Android library lets you load all major ad types—Native, Banner, Interstitial, App Open—with beautiful templates, smooth loading layouts, and user-controlled UI. Monetization has never been this simple.
+
+## Native Ad Template Design
+
+## Banner Native 
+<img src="./images/banner.png" alt="Banner Native Ad Displaying">
 
 ### Third-party licenses
 
