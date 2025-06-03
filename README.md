@@ -105,6 +105,14 @@ public class MainActivity extends AppCompatActivity {
 ## Say goodbye to complex ad integrations!
 This Kotlin-powered Android library lets you load all major ad types—Native, Banner, Interstitial, App Open—with beautiful templates, smooth loading layouts, and user-controlled UI. Monetization has never been this simple.
 
+
+### Configuration
+
+| Property                | Type      | Description                                                                                                               |
+|-------------------------|-----------|---------------------------------------------------------------------------------------------------------------------------|
+| nativesize              | size      | Must for Native size ("banner" , "small/adaptive" , "medium" , "large" , "large_1")   |
+| background color        | color     | Color of the Native Ad container (defaults to ##008000)                                                                   |
+
 ## Native Ad Template Design
 
 ## Banner Native 
