@@ -1,0 +1,42 @@
+[versions]
+agp = "8.8.2"
+androidxAppcompat = "1.4.0"
+constraintlayoutVersion = "2.1.2"
+espressoCoreVersion = "3.4.0"
+kotlin = "2.1.0"
+coreKtx = "1.16.0"
+junit = "4.13.2"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+appcompat = "1.7.0"
+material = "1.12.0"
+activity = "1.10.1"
+constraintlayout = "2.2.1"
+playServicesAds = "24.3.0"
+playServicesAdsVersion = "23.0.0"
+runner = "1.6.2"
+sdpAndroid = "1.1.1"
+agskeletonloading = "1.2"
+jetbrainsKotlinJvm = "2.1.0"
+
+[libraries]
+androidx-constraintlayout-v212 = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayoutVersion" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-espresso-core-v340 = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCoreVersion" }
+androidx-runner = { module = "androidx.test:runner", version.ref = "runner" }
+appcompat-v140 = { module = "androidx.appcompat:appcompat", version.ref = "androidxAppcompat" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAds" }
+sdp-android = { module = "com.intuit.sdp:sdp-android", version.ref = "sdpAndroid" }
+agskeletonloading = { module = "com.github.AgnaldoNP:AGSkeletonLoading", version.ref = "agskeletonloading" }
+
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+
