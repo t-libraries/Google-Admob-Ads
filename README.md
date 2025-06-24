@@ -37,7 +37,7 @@ buildscript {
 ```
 ```gradle
 dependencies {
-    implementation 'com.github.Izhamalik:AdmobAds:1.0-alpha'
+    implementation 'com.github.Technest-PK:Google-Admob-Ads:1.1-alpha'
 }
 ```
 
@@ -81,16 +81,17 @@ class MainActivity : AppCompatActivity() {
 ```java
 public class MainActivity extends AppCompatActivity {
     
-    private Skeleton skeleton;
+    private FrameLayout nativeAd;
     
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        nativeAd = findViewbyid(R.id.nativeAd);
         
        AdmobNativeAd(
             this,
-            binding.nativeAd,
+            nativeAd,
             "/21775744923/example/native-video",
             "large",
             "#008000"
