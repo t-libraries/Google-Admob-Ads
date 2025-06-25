@@ -37,7 +37,7 @@ buildscript {
 ```
 ```gradle
 dependencies {
-    implementation 'com.github.Technest-PK:Google-Admob-Ads:1.1-alpha'
+    implementation 'com.github.t-libraries:Google-Admob-Ads:1.1-alpha'
 }
 ```
 
