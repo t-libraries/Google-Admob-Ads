@@ -38,7 +38,6 @@ buildscript {
 ```gradle
 dependencies {
     implementation 'com.github.t-libraries:Google-Admob-Ads:1.1-alpha'
-}
 ```
 
 ##### XML
