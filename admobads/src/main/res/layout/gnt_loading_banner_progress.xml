@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="72dp">
 
-    <aglibs.loading.skeleton.layout.SkeletonRelativeLayout
+    <com.admobads.loading.skeleton.layout.SkeletonConstraintLayout
         android:id="@+id/skeletonLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -70,6 +70,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-    </aglibs.loading.skeleton.layout.SkeletonRelativeLayout>
+    </com.admobads.loading.skeleton.layout.SkeletonConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -19,6 +19,9 @@
     <dimen name="gnt_no_size">0dp</dimen>
     <dimen name="gnt_small_margin">5dp</dimen>
     <dimen name="gnt_100sdp">100.00dp</dimen>
+    <dimen name="defaultSkeletonCornerRadius">5dp</dimen>
+    <dimen name="defaultSkeletonStrokeWidth">30dp</dimen>
+    <dimen name="defaultSkeletonBlurWidth">25dp</dimen>
     <dimen name="gnt_102sdp">102.00dp</dimen>
     <dimen name="gnt_103sdp">103.00dp</dimen>
     <dimen name="gnt_101sdp">101.00dp</dimen>

@@ -15,6 +15,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatButton;
 
+import com.admobads.loading.skeleton.layout.SkeletonConstraintLayout;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdLoader;
 import com.google.android.gms.ads.LoadAdError;
@@ -35,6 +36,7 @@ public class AdmobNativeAd {
     private Integer bodytextColor = 0;
     private Integer headingtextColor = 0;
     private Integer skeltonColor = 0;
+    private Integer backgroundcolor = 0;
 
 
     private String TAG = "AdNativeOnDemand";
@@ -57,6 +59,12 @@ public class AdmobNativeAd {
         this.skeltonColor = skeltonColor;
         return this;
     }
+
+
+//    public AdmobNativeAd setBackgroundColor(Integer bgcolor) {
+//        this.backgroundcolor = bgcolor;
+//        return this;
+//    }
 
     public AdmobNativeAd setCtaButtonPosition(String cta_btn_position) {
         this.cta_btn_position = cta_btn_position;
@@ -100,8 +108,13 @@ public class AdmobNativeAd {
         // Inflate the loading view
         View loadingView = getloadingtype(adType);
 
-        if (skeltonColor != 0)
-            loadingView.findViewById(R.id.skeletonLayout).setBackgroundColor(ctx.getResources().getColor(skeltonColor));
+        if (skeltonColor != 0) {
+            SkeletonConstraintLayout skeletonLayout = loadingView.findViewById(R.id.skeletonLayout);
+            skeletonLayout.setSkeletonColor(skeltonColor);
+        }
+
+        if (backgroundcolor != 0)
+            loadingView.findViewById(R.id.skeletonLayout).setBackgroundColor(ctx.getResources().getColor(backgroundcolor));
 
         // Set the height of the loading view
         ViewGroup.LayoutParams layoutParams = loadingView.getLayoutParams();
