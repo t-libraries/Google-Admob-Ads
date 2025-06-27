@@ -124,7 +124,7 @@
                                 android:background="@drawable/gnt_outline_hollow_shape_f"
                                 android:gravity="center"
                                 android:text="AD"
-                                android:textColor="#386BF6"
+                                android:textColor="#ff0000"
                                 android:textSize="11sp"
                                 android:textStyle="bold"
                                 app:layout_constraintStart_toStartOf="parent"
