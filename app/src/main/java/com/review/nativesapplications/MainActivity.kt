@@ -1,13 +1,11 @@
 package com.review.nativesapplications
 
-import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.admobads.ads.AdmobNativeAd
+import com.admobads.AdmobAdManger
 import com.google.android.gms.ads.MobileAds
 import com.review.nativesapplications.databinding.ActivityMainBinding
 
@@ -30,14 +28,15 @@ class MainActivity : AppCompatActivity() {
 
         MobileAds.initialize(this)
 
-        AdmobNativeAd(
+
+        AdmobAdManger(
             this,
-            binding.nativeAd,
-            "/21775744923/example/native-video",
-            "small",
-            "#008000"
+            binding.nativeAd
         )
-            .setSkeltonColor(Color.GREEN)
-            .load()
+            .loadAd(
+                "ca-app-pub-3940256099942544/9214589741",
+                "banner",
+                3
+            )
     }
 }

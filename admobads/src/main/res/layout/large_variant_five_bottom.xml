@@ -71,16 +71,16 @@
                         android:id="@+id/cardview"
                         android:layout_width="52dp"
                         android:layout_height="52dp"
-                        android:layout_marginStart="@dimen/_5sdp"
-                        android:layout_marginLeft="@dimen/_5sdp"
+                        android:layout_marginStart="@dimen/_8sdp"
                         android:elevation="0dp"
                         android:padding="@dimen/_3sdp"
                         app:cardBackgroundColor="@android:color/transparent"
                         app:cardCornerRadius="@dimen/_4sdp"
                         app:cardElevation="0dp"
+                        app:layout_constraintBottom_toTopOf="@+id/gnt_linearlayout"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_chainStyle="spread">
+                        app:layout_constraintVertical_chainStyle="spread_inside">
 
                         <ImageView
                             android:id="@+id/icon"
@@ -133,8 +133,9 @@
                     <LinearLayout
                         android:id="@+id/gnt_linearlayout"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="25dp"
                         android:layout_marginVertical="@dimen/_5sdp"
+                        android:gravity="center_vertical"
                         app:layout_constraintBottom_toTopOf="@+id/row_two"
                         app:layout_constraintEnd_toEndOf="@+id/headline"
                         app:layout_constraintHorizontal_bias="0.5"
@@ -143,9 +144,9 @@
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="@dimen/_45sdp"
-                            android:layout_height="@dimen/_17sdp"
+                            android:layout_height="25dp"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" >
+                            app:layout_constraintTop_toTopOf="parent">
 
                             <TextView
                                 android:id="@+id/ad_notification_view"
@@ -158,6 +159,7 @@
                                 android:textColor="#ff0000"
                                 android:textSize="12sp"
                                 android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -189,7 +191,8 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toStartOf="@+id/cardview">
+                        app:layout_constraintStart_toStartOf="@+id/cardview"
+                        app:layout_constraintTop_toBottomOf="@+id/gnt_linearlayout">
 
                         <TextView
                             android:id="@+id/secondary"
@@ -211,8 +214,8 @@
                             android:id="@+id/body"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="@dimen/_4sdp"
                             android:layout_marginTop="@dimen/_3sdp"
+                            android:layout_marginEnd="@dimen/_4sdp"
                             android:gravity="top"
                             android:lines="2"
                             android:maxLines="2"

@@ -150,7 +150,7 @@
                     <LinearLayout
                         android:id="@+id/gnt_linearlayout"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="25dp"
                         android:layout_marginVertical="@dimen/_5sdp"
                         app:layout_constraintBottom_toTopOf="@+id/row_two"
                         app:layout_constraintEnd_toEndOf="@+id/headline"
@@ -161,22 +161,24 @@
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="@dimen/_45sdp"
                             android:layout_height="@dimen/_17sdp"
+                            android:layout_gravity="center_vertical"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" >
 
-                        <TextView
-                            android:id="@+id/ad_notification_view"
-                            android:layout_width="@dimen/_25sdp"
-                            android:layout_height="@dimen/_17sdp"
-                            android:layout_gravity="center_vertical"
-                            android:background="@drawable/gnt_outline_hollow_shape_f"
-                            android:gravity="center"
-                            android:text="AD"
-                            android:textColor="#ff0000"
-                            android:textSize="12sp"
-                            android:textStyle="bold"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            <TextView
+                                android:id="@+id/ad_notification_view"
+                                android:layout_width="@dimen/_25sdp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center_vertical"
+                                android:background="@drawable/gnt_outline_hollow_shape_f"
+                                android:gravity="center"
+                                android:text="AD"
+                                android:textColor="#ff0000"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 

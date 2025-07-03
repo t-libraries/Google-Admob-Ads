@@ -9,16 +9,15 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/nativeContainer"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="visible"
-        app:cardBackgroundColor="#CC0A0A"
+        app:cardBackgroundColor="#799079"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:strokeWidth="0dp">
-
 
         <FrameLayout
             android:id="@+id/nativeAd"

@@ -21,6 +21,7 @@ import com.google.android.gms.ads.AdLoader;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.admanager.AdManagerAdRequest;
 import com.google.android.gms.ads.nativead.NativeAd;
+import com.google.android.gms.ads.nativead.NativeAdOptions;
 import com.google.android.gms.ads.nativead.NativeAdView;
 
 import java.util.Objects;
@@ -30,7 +31,7 @@ public class AdmobNativeAd {
     private final Activity ctx;
     private final FrameLayout nativeAdContainer;
     private final String id;
-    private final String type;
+    private final Integer type;
     private String buttonColor;
     private String cta_btn_position = "";
     private Integer bodytextColor = 0;
@@ -41,7 +42,7 @@ public class AdmobNativeAd {
 
     private String TAG = "AdNativeOnDemand";
 
-    public AdmobNativeAd(Activity ctx, FrameLayout nativeAdContainer, String id, String type, String buttonColor) {
+    public AdmobNativeAd(Activity ctx, FrameLayout nativeAdContainer, String id, Integer type, String buttonColor) {
         this.ctx = ctx;
         this.nativeAdContainer = nativeAdContainer;
         this.id = id;
@@ -85,20 +86,27 @@ public class AdmobNativeAd {
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                         Log.d(TAG, "Failed :: " + loadAdError.getMessage());
-                        nativeAdContainer.removeAllViews();
-                        nativeAdContainer.setVisibility(View.GONE);
+//                        nativeAdContainer.removeAllViews();
+//                        nativeAdContainer.setVisibility(View.GONE);
                     }
-                }).build();
+                })
+                .withNativeAdOptions(
+                        new NativeAdOptions.Builder()
+                                .setRequestCustomMuteThisAd(true)
+                                .setAdChoicesPlacement(NativeAdOptions.ADCHOICES_TOP_RIGHT)
+                                .build()
+                )
+                .build();
 
         adLoader.loadAd(new AdManagerAdRequest.Builder().build());
     }
 
-    private void setupNativeContainer(String adType) {
+    private void setupNativeContainer(Integer adType) {
         // Remove any existing views in the container
         nativeAdContainer.removeAllViews();
 
         // Determine the height for the loading view based on ad type
-        AdType type = AdType.fromString(adType);
+        AdType type = AdType.fromInt(adType);
         int adHeight = type.getHeightDp();
 
         // Convert height from DP to pixels
@@ -136,7 +144,7 @@ public class AdmobNativeAd {
     }
 
     private NativeAdView createNativeView() {
-        AdType adType = AdType.fromString(type);
+        AdType adType = AdType.fromInt(type);
         int layoutId;
         switch (adType) {
             case BANNER: {
@@ -186,7 +194,7 @@ public class AdmobNativeAd {
         adView.setMediaView(adView.findViewById(R.id.media_view));
 
         // Set rating
-        AdType adType = AdType.fromString(type);
+        AdType adType = AdType.fromInt(type);
 
         if (adType != AdType.BANNER) {
             if (adType != AdType.LARGE_1) {
@@ -270,20 +278,17 @@ public class AdmobNativeAd {
         adView.setNativeAd(nativeAd);
     }
 
-    public View getloadingtype(String type) {
+    public View getloadingtype(Integer type) {
         if (type == null)
             return LayoutInflater.from(ctx).inflate(R.layout.gnt_loading_large_progress, nativeAdContainer, false);
-        switch (type.toLowerCase()) {
-            case "banner":
-                return LayoutInflater.from(ctx).inflate(R.layout.gnt_loading_banner_progress, nativeAdContainer, false);
-            case "small":
-            case "adaptive":
+        switch (type) {
+            case 3:
                 return LayoutInflater.from(ctx).inflate(R.layout.gnt_loading_adaptive_progress, nativeAdContainer, false);
-            case "medium":
+            case 4:
                 return LayoutInflater.from(ctx).inflate(R.layout.gnt_loading_medium_progress, nativeAdContainer, false);
-            case "large":
+            case 2:
                 return LayoutInflater.from(ctx).inflate(R.layout.gnt_loading_large_progress, nativeAdContainer, false);
-            case "large_1":
+            case 1:
                 return LayoutInflater.from(ctx).inflate(R.layout.gnt_loading_large_progress, nativeAdContainer, false);
         }
         return null;
@@ -293,11 +298,11 @@ public class AdmobNativeAd {
 
 enum AdType {
     BANNER(72),
-    SMALL(175),
+    SMALL(160),
     MEDIUM(210),
     LARGE(288),
     LARGE_1(288),
-    ADAPTIVE(175);
+    ADAPTIVE(160);
 
     private final int heightDp;
 
@@ -309,23 +314,19 @@ enum AdType {
         return heightDp;
     }
 
-    public static AdType fromString(String type) {
-        if (type == null) return LARGE; // default
-        switch (type.toLowerCase()) {
-            case "banner":
-                return BANNER;
-            case "small":
+    public static AdType fromInt(Integer type) {
+        if (type == null) return SMALL; // default
+        switch (type) {
+            case 3:
                 return SMALL;
-            case "medium":
+            case 4:
                 return MEDIUM;
-            case "large":
+            case 2:
                 return LARGE;
-            case "large_1":
+            case 1:
                 return LARGE_1;
-            case "adaptive":
-                return ADAPTIVE;
             default:
-                return LARGE; // fallback
+                return SMALL; // fallback
         }
     }
 }

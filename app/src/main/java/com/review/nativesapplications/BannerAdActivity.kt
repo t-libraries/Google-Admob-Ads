@@ -26,8 +26,8 @@ class BannerAdActivity : AppCompatActivity() {
             insets
         }
 
-        AdmobBannerAd(this, binding.bannercontainer)
-            .setSkeletonColor(Color.parseColor("#E6E6E6"))
-            .loadBannerAd("ca-app-pub-3940256099942544/9214589741", "MEDIUM_RECTANGLE")
+//        AdmobBannerAd(this, binding.bannercontainer)
+//            .setSkeletonColor(Color.parseColor("#E6E6E6"))
+//            .loadBannerAd("ca-app-pub-3940256099942544/9214589741", "LARGE_BANNER")
     }
 }

@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.admobads.ads.utils.isNetworkAvailable
 import com.admobads.loading.skeleton.layout.SkeletonConstraintLayout
 import com.google.ads.mediation.admob.AdMobAdapter
 import com.google.android.gms.ads.AdListener
@@ -40,19 +39,12 @@ class AdmobBannerAd(
         return this
     }
 
-
-//    fun setBackgroundColor(color: Int): AdmobBannerAd {
-//        this.backgroundcolor = color
-//        return this
-//    }
-
-
     fun loadBannerAd(
         adUnitId: String,
-        adType: String,
+        adType: Int,
         position: BannerPosition = BannerPosition.BOTTOM
     ) {
-        loadBannerAd(adUnitId, BannerAdType.fromString(adType), position)
+        loadBannerAd(adUnitId, BannerAdType.fromInt(adType), position)
     }
 
 
@@ -65,10 +57,10 @@ class AdmobBannerAd(
         setupViewHierarchy()
         showLoadingState()
 
-        if (!isNetworkAvailable(context)) {
-            hideAllAdViews()
-            return
-        }
+//        if (!isNetworkAvailable(context)) {
+//            hideAllAdViews()
+//            return
+//        }
 
         when (position) {
             BannerPosition.BOTTOM -> loadBannerAd(adUnitId, adType)
@@ -105,12 +97,9 @@ class AdmobBannerAd(
     private fun returnLoadingLayout(adType: BannerAdType? = null): ConstraintLayout {
         val layoutRes = when (adType) {
             BannerAdType.STANDARD -> R.layout.banner_standard_loading
-            BannerAdType.FULL_BANNER -> R.layout.banner_standard_loading
-            BannerAdType.LARGE_BANNER -> R.layout.banner_standard_loading
+            BannerAdType.LARGE_BANNER -> R.layout.banner_full_loading
             BannerAdType.MEDIUM_RECTANGLE -> R.layout.banner_rectangle_loading
-            BannerAdType.LEADERBOARD -> R.layout.banner_standard_loading
             BannerAdType.COLLAPSIBLE -> R.layout.banner_standard_loading
-            BannerAdType.ADAPTIVE -> R.layout.banner_standard_loading
             null -> R.layout.banner_standard_loading
         }
 
@@ -153,11 +142,8 @@ class AdmobBannerAd(
                 initialLayoutComplete = true
                 when (adType) {
                     BannerAdType.STANDARD,
-                    BannerAdType.FULL_BANNER,
                     BannerAdType.LARGE_BANNER,
-                    BannerAdType.MEDIUM_RECTANGLE,
-                    BannerAdType.LEADERBOARD,
-                    BannerAdType.ADAPTIVE -> loadStandardBanner()
+                    BannerAdType.MEDIUM_RECTANGLE -> loadStandardBanner()
 
                     BannerAdType.COLLAPSIBLE -> loadCollapsibleBanner(position = "bottom")
                 }
@@ -174,11 +160,8 @@ class AdmobBannerAd(
                 initialLayoutComplete = true
                 when (adType) {
                     BannerAdType.STANDARD,
-                    BannerAdType.FULL_BANNER,
                     BannerAdType.LARGE_BANNER,
-                    BannerAdType.MEDIUM_RECTANGLE,
-                    BannerAdType.LEADERBOARD,
-                    BannerAdType.ADAPTIVE -> loadStandardBanner()
+                    BannerAdType.MEDIUM_RECTANGLE -> loadStandardBanner()
 
                     BannerAdType.COLLAPSIBLE -> loadCollapsibleBanner(position = "top")
                 }
@@ -218,7 +201,8 @@ class AdmobBannerAd(
         adView.loadAd(adRequest)
         adView.adListener = object : AdListener() {
             override fun onAdFailedToLoad(error: LoadAdError) {
-                hideAllAdViews()
+                Log.d(TAG, "Failed to load ad: $error")
+//                hideAllAdViews()
             }
 
             override fun onAdLoaded() {
@@ -230,13 +214,10 @@ class AdmobBannerAd(
 
     private fun getAdSizeForType(adType: BannerAdType): AdSize {
         return when (adType) {
-            BannerAdType.STANDARD -> AdSize.BANNER
-            BannerAdType.FULL_BANNER -> AdSize.FULL_BANNER
-            BannerAdType.LARGE_BANNER -> AdSize.LARGE_BANNER
+            BannerAdType.STANDARD -> adSize
+            BannerAdType.LARGE_BANNER -> large_banner_adSize
             BannerAdType.MEDIUM_RECTANGLE -> AdSize.MEDIUM_RECTANGLE
-            BannerAdType.LEADERBOARD -> AdSize.LEADERBOARD
-            BannerAdType.COLLAPSIBLE,
-            BannerAdType.ADAPTIVE -> {
+            BannerAdType.COLLAPSIBLE -> {
                 val display = context.windowManager.defaultDisplay
                 val outMetrics = DisplayMetrics()
                 display.getMetrics(outMetrics)
@@ -273,27 +254,66 @@ class AdmobBannerAd(
         bannerAdContainer.removeAllViews()
         adView.destroy()
     }
+
+
+    private val adSize: AdSize
+        get() {
+            val outMetrics = context.resources.displayMetrics
+            val density = outMetrics.density
+
+            // Always use screen width
+            val adWidthPixels = outMetrics.widthPixels.toFloat()
+            val adWidth = (adWidthPixels / density).toInt()
+
+            return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, adWidth)
+        }
+
+
+    private val large_banner_adSize: AdSize
+        get() {
+            val displayMetrics = context.resources.displayMetrics
+            val density = displayMetrics.density
+
+            val screenWidthPixels = displayMetrics.widthPixels.toFloat()
+            val adWidthInDp = (screenWidthPixels / density).toInt()
+
+            // LARGE_BANNER has a fixed height of 100 dp
+            val largeBannerHeightDp = AdSize.LARGE_BANNER.height
+
+            return AdSize(adWidthInDp, largeBannerHeightDp)
+        }
+
+    private val full_banner_adSize: AdSize
+        get() {
+            val displayMetrics = context.resources.displayMetrics
+            val density = displayMetrics.density
+
+            val screenWidthPixels = displayMetrics.widthPixels.toFloat()
+            val adWidthInDp = (screenWidthPixels / density).toInt()
+
+            // LARGE_BANNER has a fixed height of 100 dp
+            val largeBannerHeightDp = AdSize.FULL_BANNER.height
+
+            return AdSize(adWidthInDp, largeBannerHeightDp)
+        }
+
+
+
 }
 
 enum class BannerAdType {
     STANDARD,
-    FULL_BANNER,
     LARGE_BANNER,
     MEDIUM_RECTANGLE,
-    LEADERBOARD,
-    COLLAPSIBLE,
-    ADAPTIVE;
+    COLLAPSIBLE;
 
     companion object {
-        fun fromString(value: String): BannerAdType {
-            return when (value.uppercase()) {
-                "STANDARD" -> STANDARD
-                "FULL_BANNER" -> FULL_BANNER
-                "LARGE_BANNER" -> LARGE_BANNER
-                "MEDIUM_RECTANGLE" -> MEDIUM_RECTANGLE
-                "LEADERBOARD" -> LEADERBOARD
-                "COLLAPSIBLE" -> COLLAPSIBLE
-                "ADAPTIVE" -> ADAPTIVE
+        fun fromInt(value: Int): BannerAdType {
+            return when (value) {
+                4 -> STANDARD
+                3 -> LARGE_BANNER
+                2 -> MEDIUM_RECTANGLE
+                1 -> COLLAPSIBLE
                 else -> STANDARD
             }
         }
