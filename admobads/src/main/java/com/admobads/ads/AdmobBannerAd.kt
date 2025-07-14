@@ -277,7 +277,6 @@ class AdmobBannerAd(
             val screenWidthPixels = displayMetrics.widthPixels.toFloat()
             val adWidthInDp = (screenWidthPixels / density).toInt()
 
-            // LARGE_BANNER has a fixed height of 100 dp
             val largeBannerHeightDp = AdSize.LARGE_BANNER.height
 
             return AdSize(adWidthInDp, largeBannerHeightDp)
@@ -291,7 +290,6 @@ class AdmobBannerAd(
             val screenWidthPixels = displayMetrics.widthPixels.toFloat()
             val adWidthInDp = (screenWidthPixels / density).toInt()
 
-            // LARGE_BANNER has a fixed height of 100 dp
             val largeBannerHeightDp = AdSize.FULL_BANNER.height
 
             return AdSize(adWidthInDp, largeBannerHeightDp)
@@ -310,9 +308,9 @@ enum class BannerAdType {
     companion object {
         fun fromInt(value: Int): BannerAdType {
             return when (value) {
-                4 -> STANDARD
-                3 -> LARGE_BANNER
-                2 -> MEDIUM_RECTANGLE
+                4 -> LARGE_BANNER
+                3 -> MEDIUM_RECTANGLE
+                2 -> STANDARD
                 1 -> COLLAPSIBLE
                 else -> STANDARD
             }

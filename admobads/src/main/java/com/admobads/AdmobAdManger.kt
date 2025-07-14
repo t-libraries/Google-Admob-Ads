@@ -67,5 +67,9 @@ class AdmobAdManger(
         return this
     }
 
+    fun setSkeltonColor(color: Int): AdmobAdManger {
+        this.skeletonColor = color
+        return this
+    }
 
 }

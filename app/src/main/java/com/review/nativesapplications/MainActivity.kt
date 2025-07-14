@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.admobads.AdmobAdManger
+import com.admobads.ads.BannerPosition
 import com.google.android.gms.ads.MobileAds
 import com.review.nativesapplications.databinding.ActivityMainBinding
 
@@ -28,15 +29,15 @@ class MainActivity : AppCompatActivity() {
 
         MobileAds.initialize(this)
 
-
         AdmobAdManger(
             this,
             binding.nativeAd
         )
+            .setBannerCollapsiblePosition(BannerPosition.BOTTOM)
             .loadAd(
                 "ca-app-pub-3940256099942544/9214589741",
                 "banner",
-                3
+                4
             )
     }
 }
