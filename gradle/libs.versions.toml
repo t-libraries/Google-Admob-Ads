@@ -1,8 +1,12 @@
 [versions]
 agp = "8.8.2"
 androidxAppcompat = "1.4.0"
+androidxConstraintlayout = "2.2.1"
+androidxEspressoCore = "3.6.1"
+appcompatVersion = "1.7.1"
 constraintlayoutVersion = "2.1.2"
 espressoCoreVersion = "3.4.0"
+googlePlayServicesAds = "23.0.0"
 kotlin = "2.1.0"
 coreKtx = "1.16.0"
 junit = "4.13.2"
@@ -15,23 +19,31 @@ constraintlayout = "2.2.1"
 playServicesAds = "24.3.0"
 playServicesAdsVersion = "23.0.0"
 runner = "1.6.2"
+runnerVersion = "1.4.0"
 sdpAndroid = "1.1.1"
 agskeletonloading = "1.2"
 jetbrainsKotlinJvm = "2.1.0"
+sdpAndroidVersion = "1.1.0"
 
 [libraries]
+androidx-appcompat-v171 = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
 androidx-constraintlayout-v212 = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayoutVersion" }
+androidx-constraintlayout-v221 = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidxConstraintlayout" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-espresso-core-v340 = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCoreVersion" }
+androidx-espresso-core-v361 = { module = "androidx.test.espresso:espresso-core", version.ref = "androidxEspressoCore" }
 androidx-runner = { module = "androidx.test:runner", version.ref = "runner" }
+androidx-runner-v140 = { module = "androidx.test:runner", version.ref = "runnerVersion" }
 appcompat-v140 = { module = "androidx.appcompat:appcompat", version.ref = "androidxAppcompat" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAds" }
+play-services-ads-v2300 = { module = "com.google.android.gms:play-services-ads", version.ref = "googlePlayServicesAds" }
 sdp-android = { module = "com.intuit.sdp:sdp-android", version.ref = "sdpAndroid" }
 agskeletonloading = { module = "com.github.AgnaldoNP:AGSkeletonLoading", version.ref = "agskeletonloading" }
+sdp-android-v110 = { module = "com.intuit.sdp:sdp-android", version.ref = "sdpAndroidVersion" }
 
 
 [plugins]

@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -104,16 +103,7 @@ public class AdmobNativeAd {
     private void setupNativeContainer(Integer adType) {
         // Remove any existing views in the container
         nativeAdContainer.removeAllViews();
-
-        // Determine the height for the loading view based on ad type
         AdType type = AdType.fromInt(adType);
-        int adHeight = type.getHeightDp();
-
-        // Convert height from DP to pixels
-        float density = ctx.getResources().getDisplayMetrics().density;
-        int heightPx = (int) (adHeight * density);
-
-        // Inflate the loading view
         View loadingView = getloadingtype(adType);
 
         if (skeltonColor != 0) {
@@ -123,11 +113,6 @@ public class AdmobNativeAd {
 
         if (backgroundcolor != 0)
             loadingView.findViewById(R.id.skeletonLayout).setBackgroundColor(ctx.getResources().getColor(backgroundcolor));
-
-        // Set the height of the loading view
-        ViewGroup.LayoutParams layoutParams = loadingView.getLayoutParams();
-        layoutParams.height = heightPx;
-        loadingView.setLayoutParams(layoutParams);
 
         // Add the loading view to the container
         nativeAdContainer.addView(loadingView);
@@ -149,33 +134,33 @@ public class AdmobNativeAd {
         switch (adType) {
             case BANNER: {
                 if (Objects.equals(cta_btn_position, "top")) {
-                    layoutId = R.layout.gnt_small_template_view_side_button_a;
+                    layoutId = R.layout.tlib_small_template_view_side_button_a;
                 } else {
-                    layoutId = R.layout.gnt_small_template_view_side_button_a;
+                    layoutId = R.layout.tlib_small_template_view_side_button_a;
                 }
             }
             break;
             case SMALL:
             case ADAPTIVE:
                 if (Objects.equals(cta_btn_position, "top")) {
-                    layoutId = R.layout.large_variant_six_top;
+                    layoutId = R.layout.tlib_large_variant_six_top;
                 } else
-                    layoutId = R.layout.large_variant_six_bottom;
+                    layoutId = R.layout.tlib_large_variant_six_bottom;
                 break;
             case LARGE:
                 if (Objects.equals(cta_btn_position, "top")) {
-                    layoutId = R.layout.large_variant_four_top;
+                    layoutId = R.layout.tlib_large_variant_four_top;
                 } else
-                    layoutId = R.layout.large_variant_four_bottom;
+                    layoutId = R.layout.tlib_large_variant_four_bottom;
                 break;
             case LARGE_1:
-                layoutId = R.layout.large_variant_three_bottom;
+                layoutId = R.layout.tlib_large_variant_three_bottom;
                 break;
             default:
                 if (Objects.equals(cta_btn_position, "top")) {
-                    layoutId = R.layout.large_variant_five_top;
+                    layoutId = R.layout.tlib_large_variant_five_top;
                 } else
-                    layoutId = R.layout.large_variant_five_bottom;
+                    layoutId = R.layout.tlib_large_variant_five_bottom;
                 break;
         }
 
@@ -280,16 +265,16 @@ public class AdmobNativeAd {
 
     public View getloadingtype(Integer type) {
         if (type == null)
-            return LayoutInflater.from(ctx).inflate(R.layout.gnt_loading_large_progress, nativeAdContainer, false);
+            return LayoutInflater.from(ctx).inflate(R.layout.tlib_loading_large_progress, nativeAdContainer, false);
         switch (type) {
             case 3:
-                return LayoutInflater.from(ctx).inflate(R.layout.gnt_loading_adaptive_progress, nativeAdContainer, false);
+                return LayoutInflater.from(ctx).inflate(R.layout.tlib_loading_adaptive_progress, nativeAdContainer, false);
             case 4:
-                return LayoutInflater.from(ctx).inflate(R.layout.gnt_loading_medium_progress, nativeAdContainer, false);
+                return LayoutInflater.from(ctx).inflate(R.layout.tlib_loading_medium_progress, nativeAdContainer, false);
             case 2:
-                return LayoutInflater.from(ctx).inflate(R.layout.gnt_loading_large_progress, nativeAdContainer, false);
+                return LayoutInflater.from(ctx).inflate(R.layout.tlib_loading_large_progress, nativeAdContainer, false);
             case 1:
-                return LayoutInflater.from(ctx).inflate(R.layout.gnt_loading_large_progress, nativeAdContainer, false);
+                return LayoutInflater.from(ctx).inflate(R.layout.tlib_loading_large_progress, nativeAdContainer, false);
         }
         return null;
     }
@@ -297,22 +282,13 @@ public class AdmobNativeAd {
 
 
 enum AdType {
-    BANNER(72),
-    SMALL(160),
-    MEDIUM(210),
-    LARGE(288),
-    LARGE_1(288),
-    ADAPTIVE(160);
+    BANNER,
+    SMALL,
+    MEDIUM,
+    LARGE,
+    LARGE_1,
+    ADAPTIVE;
 
-    private final int heightDp;
-
-    AdType(int heightDp) {
-        this.heightDp = heightDp;
-    }
-
-    public int getHeightDp() {
-        return heightDp;
-    }
 
     public static AdType fromInt(Integer type) {
         if (type == null) return SMALL; // default

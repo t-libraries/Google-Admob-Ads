@@ -70,7 +70,7 @@ abstract class SkeletonDrawer(private val view: View) : ValueAnimator.AnimatorUp
 
             val typedArray = view.context.obtainStyledAttributes(
                 attrs, R.styleable.SkeletonView, defStyle,
-                R.style.DefaultSkeletonView
+                R.style.tlib_DefaultSkeletonView
             )
 
             autoStart = typedArray.getBoolean(

@@ -66,7 +66,7 @@
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/content"
-                    android:layout_width="@dimen/gnt_no_size"
+                    android:layout_width="@dimen/tlib_no_size"
                     android:layout_height="0dp"
                     android:layout_marginStart="@dimen/_5sdp"
                     android:layout_marginEnd="@dimen/_15sdp"
@@ -79,7 +79,7 @@
                         android:id="@+id/headline"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        app:layout_constraintBottom_toTopOf="@+id/gnt_linearlayout"
+                        app:layout_constraintBottom_toTopOf="@+id/tlib_linearlayout"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toStartOf="parent"
@@ -89,7 +89,7 @@
                     </ImageView>
 
                     <ImageView
-                        android:id="@+id/gnt_linearlayout"
+                        android:id="@+id/tlib_linearlayout"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_marginVertical="@dimen/_2sdp"
@@ -106,7 +106,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/gnt_linearlayout" />
+                        app:layout_constraintTop_toBottomOf="@+id/tlib_linearlayout" />
 
 
                 </androidx.constraintlayout.widget.ConstraintLayout>

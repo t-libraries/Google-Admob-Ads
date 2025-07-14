@@ -32,6 +32,7 @@ android {
 
     lint {
         baseline = file("lint-baseline.xml")
+        resourcePrefix 'tlib_'
     }
 }
 
@@ -103,13 +104,13 @@ afterEvaluate {
 dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.4.0'
-    testImplementation 'junit:junit:4.13.2'
-    implementation "com.google.android.material:material:1.12.0"
-    androidTestImplementation 'androidx.test:runner:1.4.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    implementation 'com.google.android.gms:play-services-ads:23.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
-    implementation 'com.intuit.sdp:sdp-android:1.1.0'
+    implementation libs.androidx.appcompat.v171
+    testImplementation libs.junit
+    implementation libs.material
+    androidTestImplementation libs.androidx.runner.v140
+    androidTestImplementation libs.androidx.espresso.core.v361
+    implementation libs.play.services.ads.v2300
+    implementation libs.androidx.constraintlayout.v221
+    implementation libs.sdp.android.v110
 
 }

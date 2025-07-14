@@ -96,11 +96,11 @@ class AdmobBannerAd(
 
     private fun returnLoadingLayout(adType: BannerAdType? = null): ConstraintLayout {
         val layoutRes = when (adType) {
-            BannerAdType.STANDARD -> R.layout.banner_standard_loading
-            BannerAdType.LARGE_BANNER -> R.layout.banner_full_loading
-            BannerAdType.MEDIUM_RECTANGLE -> R.layout.banner_rectangle_loading
-            BannerAdType.COLLAPSIBLE -> R.layout.banner_standard_loading
-            null -> R.layout.banner_standard_loading
+            BannerAdType.STANDARD -> R.layout.tlib_banner_standard_loading
+            BannerAdType.LARGE_BANNER -> R.layout.tlib_banner_full_loading
+            BannerAdType.MEDIUM_RECTANGLE -> R.layout.tlib_banner_rectangle_loading
+            BannerAdType.COLLAPSIBLE -> R.layout.tlib_banner_standard_loading
+            null -> R.layout.tlib_banner_standard_loading
         }
 
         loadingLayout = LayoutInflater.from(context).inflate(
