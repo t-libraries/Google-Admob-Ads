@@ -162,7 +162,6 @@ class AdmobBannerAd(
                     BannerAdType.STANDARD,
                     BannerAdType.LARGE_BANNER,
                     BannerAdType.MEDIUM_RECTANGLE -> loadStandardBanner()
-
                     BannerAdType.COLLAPSIBLE -> loadCollapsibleBanner(position = "top")
                 }
             }

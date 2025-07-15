@@ -60,12 +60,6 @@ public class AdmobNativeAd {
         return this;
     }
 
-
-//    public AdmobNativeAd setBackgroundColor(Integer bgcolor) {
-//        this.backgroundcolor = bgcolor;
-//        return this;
-//    }
-
     public AdmobNativeAd setCtaButtonPosition(String cta_btn_position) {
         this.cta_btn_position = cta_btn_position;
         return this;
@@ -245,14 +239,18 @@ public class AdmobNativeAd {
             if (buttonColor != null) {
                 try {
                     backgroundColor = Color.parseColor(buttonColor.trim());
-                } catch (Exception e) {
-                    buttonColor = "#" + buttonColor;
-                    backgroundColor = Color.parseColor(buttonColor.trim());
+                } catch (Exception e1) {
+                    try {
+                        buttonColor = "#" + buttonColor.trim();
+                        backgroundColor = Color.parseColor(buttonColor);
+                    } catch (Exception e2) {
+                        backgroundColor = Color.parseColor("#008000"); // fallback color
+                    }
                 }
-
             } else {
-                backgroundColor = Color.parseColor("#008000");
+                backgroundColor = Color.parseColor("#008000"); // default green
             }
+
 
             Drawable drawable = button.getBackground();
             drawable.setColorFilter(backgroundColor, android.graphics.PorterDuff.Mode.SRC);
@@ -265,18 +263,17 @@ public class AdmobNativeAd {
 
     public View getloadingtype(Integer type) {
         if (type == null)
-            return LayoutInflater.from(ctx).inflate(R.layout.tlib_loading_large_progress, nativeAdContainer, false);
+            return LayoutInflater.from(ctx).inflate(R.layout.tlib_loading_adaptive_progress, nativeAdContainer, false);
         switch (type) {
             case 3:
                 return LayoutInflater.from(ctx).inflate(R.layout.tlib_loading_adaptive_progress, nativeAdContainer, false);
             case 4:
                 return LayoutInflater.from(ctx).inflate(R.layout.tlib_loading_medium_progress, nativeAdContainer, false);
             case 2:
-                return LayoutInflater.from(ctx).inflate(R.layout.tlib_loading_large_progress, nativeAdContainer, false);
             case 1:
                 return LayoutInflater.from(ctx).inflate(R.layout.tlib_loading_large_progress, nativeAdContainer, false);
         }
-        return null;
+        return LayoutInflater.from(ctx).inflate(R.layout.tlib_loading_adaptive_progress, nativeAdContainer, false);
     }
 }
 

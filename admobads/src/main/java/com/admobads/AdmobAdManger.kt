@@ -7,6 +7,7 @@ import androidx.core.graphics.toColorInt
 import com.admobads.ads.AdmobBannerAd
 import com.admobads.ads.AdmobNativeAd
 import com.admobads.ads.BannerPosition
+import com.admobads.data.RemoteModel
 
 class AdmobAdManger(
     private val context: Activity,

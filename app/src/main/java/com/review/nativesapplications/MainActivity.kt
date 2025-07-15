@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.admobads.AdmobAdManger
-import com.admobads.RemoteModel
+import com.admobads.data.RemoteModel
 import com.google.android.gms.ads.MobileAds
 import com.review.nativesapplications.databinding.ActivityMainBinding
 
@@ -43,6 +43,5 @@ class MainActivity : AppCompatActivity() {
                 ),
                 "native"
             )
-
     }
 }

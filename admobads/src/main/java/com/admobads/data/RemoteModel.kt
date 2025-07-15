@@ -1,4 +1,4 @@
-package com.admobads
+package com.admobads.data
 
 import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
