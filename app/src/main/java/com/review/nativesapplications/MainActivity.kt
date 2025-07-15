@@ -40,7 +40,8 @@ class MainActivity : AppCompatActivity() {
                     ad_type = 1,
                     cta_color = "#F42727",
                     hide = false
-                )
+                ),
+                "native"
             )
 
     }
