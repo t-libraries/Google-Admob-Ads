@@ -1,16 +1,14 @@
 package com.review.nativesapplications
 
-import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.admobads.AdmobAdManger
-import com.admobads.ads.BannerPosition
+import com.admobads.RemoteModel
 import com.google.android.gms.ads.MobileAds
 import com.review.nativesapplications.databinding.ActivityMainBinding
-import androidx.core.graphics.toColorInt
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,12 +33,15 @@ class MainActivity : AppCompatActivity() {
             this,
             binding.nativeAd
         )
-            .setCtaColor("#006994")
-            .setBannerCollapsiblePosition(BannerPosition.BOTTOM)
             .loadAd(
-                "ca-app-pub-3940256099942544/1044960115",
-                "native",
-                4
+                RemoteModel(
+                    id = "ca-app-pub-3940256099942544/1044960115",
+                    ad_format = "native",
+                    ad_type = 1,
+                    cta_color = "#F42727",
+                    hide = false
+                )
             )
+
     }
 }

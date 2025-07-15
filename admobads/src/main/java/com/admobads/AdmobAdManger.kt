@@ -1,42 +1,38 @@
 package com.admobads
 
 import android.app.Activity
-import android.graphics.Color
 import android.widget.FrameLayout
+import androidx.core.graphics.toColorInt
 import com.admobads.ads.AdmobBannerAd
 import com.admobads.ads.AdmobNativeAd
 import com.admobads.ads.BannerPosition
-import java.util.Locale
 
 class AdmobAdManger(
     private val context: Activity,
     private val bannerAdContainer: FrameLayout
 ) {
 
-    private var skeletonColor: Int = Color.parseColor("#E6E6E6")
+    private var skeletonColor: Int = "#E6E6E6".toColorInt()
     private var ctaPosition: String = "bottom"
     private var bodytextColor: Int = 0
     private var headingtextColor: Int = 0
     private var position: BannerPosition = BannerPosition.BOTTOM
-    private var ctaColor: String = "#00ff00"
 
     fun loadAd(
-        adUnitId: String,
-        adFormat: String,
-        adType: Int
+        modelItem: RemoteModel
     ) {
-        if (adFormat.lowercase(Locale.ROOT) == "banner") {
+        if (modelItem.ad_format == "banner") {
             AdmobBannerAd(context, bannerAdContainer)
                 .setSkeletonColor(skeletonColor)
-                .loadBannerAd(adUnitId, adType, position)
+                .loadBannerAd(modelItem.id, modelItem.ad_type, position)
 
         } else {
             AdmobNativeAd(
                 context,
                 bannerAdContainer,
-                adUnitId,
-                adType,
-                ctaColor
+                modelItem.id,
+                modelItem.ad_type,
+                modelItem.cta_color
             )
                 .setSkeltonColor(skeletonColor)
                 .setCtaButtonPosition(ctaPosition)
@@ -48,11 +44,6 @@ class AdmobAdManger(
 
     fun setCtaPostion(ctaPosition: String): AdmobAdManger {
         this.ctaPosition = ctaPosition
-        return this
-    }
-
-    fun setCtaColor(ctaColor: String): AdmobAdManger {
-        this.ctaColor = ctaColor
         return this
     }
 

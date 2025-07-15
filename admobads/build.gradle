@@ -21,6 +21,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
@@ -38,7 +39,7 @@ android {
 
 ext {
     PUBLISH_GROUP_ID = "com.github.ads"
-    PUBLISH_VERSION = "v1.1"
+    PUBLISH_VERSION = "v1.2"
     PUBLISH_ARTIFACT_ID = "admobads"
     PUBLISH_DESCRIPTION = "An android gradle plugin for admob ads"
     PUBLISH_URL = "https://github.com/t-libraries/Google-Admob-Ads"
@@ -112,5 +113,7 @@ dependencies {
     implementation libs.play.services.ads.v2300
     implementation libs.androidx.constraintlayout.v221
     implementation libs.sdp.android.v110
+
+    implementation libs.gson
 
 }

@@ -134,33 +134,33 @@ public class AdmobNativeAd {
         switch (adType) {
             case BANNER: {
                 if (Objects.equals(cta_btn_position, "top")) {
-                    layoutId = R.layout.tlib_small_template_view_side_button_a;
+                    layoutId = R.layout.tlib_banner_variant_one;
                 } else {
-                    layoutId = R.layout.tlib_small_template_view_side_button_a;
+                    layoutId = R.layout.tlib_banner_variant_one;
                 }
             }
             break;
             case SMALL:
             case ADAPTIVE:
                 if (Objects.equals(cta_btn_position, "top")) {
-                    layoutId = R.layout.tlib_large_variant_six_top;
+                    layoutId = R.layout.tlib_large_variant_one_top;
                 } else
-                    layoutId = R.layout.tlib_large_variant_six_bottom;
+                    layoutId = R.layout.tlib_adaptive_variant_one_bottom;
                 break;
             case LARGE:
                 if (Objects.equals(cta_btn_position, "top")) {
-                    layoutId = R.layout.tlib_large_variant_four_top;
+                    layoutId = R.layout.tlib_large_variant_two_top;
                 } else
-                    layoutId = R.layout.tlib_large_variant_four_bottom;
+                    layoutId = R.layout.tlib_large_variant_two_bottom;
                 break;
             case LARGE_1:
-                layoutId = R.layout.tlib_large_variant_three_bottom;
+                layoutId = R.layout.tlib_large_variant_one_bottom;
                 break;
             default:
                 if (Objects.equals(cta_btn_position, "top")) {
-                    layoutId = R.layout.tlib_large_variant_five_top;
+                    layoutId = R.layout.tlib_medium_variant_one_top;
                 } else
-                    layoutId = R.layout.tlib_large_variant_five_bottom;
+                    layoutId = R.layout.tlib_medium_variant_one_bottom;
                 break;
         }
 
