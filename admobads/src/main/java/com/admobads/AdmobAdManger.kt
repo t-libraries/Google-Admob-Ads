@@ -1,6 +1,7 @@
 package com.admobads
 
 import android.app.Activity
+import android.view.View
 import android.widget.FrameLayout
 import androidx.core.graphics.toColorInt
 import com.admobads.ads.AdmobBannerAd
@@ -19,26 +20,55 @@ class AdmobAdManger(
     private var position: BannerPosition = BannerPosition.BOTTOM
 
     fun loadAd(
-        modelItem: RemoteModel
+        modelItem: RemoteModel?, default_ad_type: String
     ) {
-        if (modelItem.ad_format == "banner") {
-            AdmobBannerAd(context, bannerAdContainer)
-                .setSkeletonColor(skeletonColor)
-                .loadBannerAd(modelItem.id, modelItem.ad_type, position)
 
-        } else {
-            AdmobNativeAd(
-                context,
-                bannerAdContainer,
-                modelItem.id,
-                modelItem.ad_type,
-                modelItem.cta_color
-            )
-                .setSkeltonColor(skeletonColor)
-                .setCtaButtonPosition(ctaPosition)
-                .setTextColor(bodytextColor, headingtextColor)
-                .load()
+        if (modelItem?.hide == true) {
+            bannerAdContainer.visibility = View.GONE
+            return
         }
+
+
+        modelItem?.apply {
+
+            if (ad_format == "banner") {
+                AdmobBannerAd(context, bannerAdContainer)
+                    .setSkeletonColor(skeletonColor)
+                    .loadBannerAd(id, ad_type, position)
+
+            } else {
+                AdmobNativeAd(
+                    context,
+                    bannerAdContainer,
+                    id,
+                    ad_type,
+                    cta_color
+                )
+                    .setSkeltonColor(skeletonColor)
+                    .setCtaButtonPosition(ctaPosition)
+                    .setTextColor(bodytextColor, headingtextColor)
+                    .load()
+            }
+
+        } ?: run {
+
+            if (default_ad_type == "banner") {
+                AdmobBannerAd(context, bannerAdContainer)
+                    .setSkeletonColor(skeletonColor)
+                    .loadBannerAd("", 2, position)
+
+            } else {
+                AdmobNativeAd(
+                    context,
+                    bannerAdContainer,
+                    "",
+                    3,
+                    "#00ff00"
+                )
+                    .load()
+            }
+        }
+
     }
 
 
