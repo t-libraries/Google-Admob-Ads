@@ -29,47 +29,53 @@ class AdmobAdManger(
             return
         }
 
-
         modelItem?.apply {
 
-            if (ad_format == "banner") {
-                AdmobBannerAd(context, bannerAdContainer)
-                    .setSkeletonColor(skeletonColor)
-                    .loadBannerAd(id, ad_type, position)
+            if (id != "") {
+                if (ad_format == "banner") {
+                    AdmobBannerAd(context, bannerAdContainer)
+                        .setSkeletonColor(skeletonColor)
+                        .loadBannerAd(id, ad_type, position)
 
+                } else {
+                    AdmobNativeAd(
+                        context,
+                        bannerAdContainer,
+                        id,
+                        ad_type,
+                        cta_color
+                    )
+                        .setSkeltonColor(skeletonColor)
+                        .setCtaButtonPosition(ctaPosition)
+                        .setTextColor(bodytextColor, headingtextColor)
+                        .load()
+                }
             } else {
-                AdmobNativeAd(
-                    context,
-                    bannerAdContainer,
-                    id,
-                    ad_type,
-                    cta_color
-                )
-                    .setSkeltonColor(skeletonColor)
-                    .setCtaButtonPosition(ctaPosition)
-                    .setTextColor(bodytextColor, headingtextColor)
-                    .load()
+                setupDefaultLayout(default_ad_format)
             }
 
         } ?: run {
-
-            if (default_ad_format == "banner") {
-                AdmobBannerAd(context, bannerAdContainer)
-                    .setSkeletonColor(skeletonColor)
-                    .loadBannerAd("", 2, position)
-
-            } else {
-                AdmobNativeAd(
-                    context,
-                    bannerAdContainer,
-                    "",
-                    3,
-                    "#00ff00"
-                )
-                    .load()
-            }
+            setupDefaultLayout(default_ad_format)
         }
 
+    }
+
+    private fun setupDefaultLayout(default_ad_format: String) {
+        if (default_ad_format == "banner") {
+            AdmobBannerAd(context, bannerAdContainer)
+                .setSkeletonColor(skeletonColor)
+                .loadBannerAd("", 2, position)
+
+        } else {
+            AdmobNativeAd(
+                context,
+                bannerAdContainer,
+                "",
+                3,
+                "#00ff00"
+            )
+                .load()
+        }
     }
 
 

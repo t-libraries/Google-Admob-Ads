@@ -10,7 +10,7 @@ data class RemoteModel(
     @SerializedName("ad_format")
     val ad_format: String = "",
     @SerializedName("ad_type")
-    val ad_type: Int = 1,
+    val ad_type: Int = 3,
     @SerializedName("cta_color")
     val cta_color: String = "#F42727",
     @SerializedName("hide")
