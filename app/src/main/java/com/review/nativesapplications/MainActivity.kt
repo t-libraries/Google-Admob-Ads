@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.admobads.AdmobAdManger
+import com.admobads.DefaultAdPlacement
 import com.admobads.data.RemoteModel
 import com.google.android.gms.ads.MobileAds
 import com.review.nativesapplications.databinding.ActivityMainBinding
@@ -41,7 +42,7 @@ class MainActivity : AppCompatActivity() {
                     cta_color = "#F42727",
                     hide = false
                 ),
-                "banner"
+                DefaultAdPlacement.BANNER
             )
     }
 }

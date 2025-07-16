@@ -21,7 +21,7 @@ class AdmobAdManger(
     private var position: BannerPosition = BannerPosition.BOTTOM
 
     fun loadAd(
-        modelItem: RemoteModel?, default_ad_format: String
+        modelItem: RemoteModel?, default_ad_format: DefaultAdPlacement = DefaultAdPlacement.NATIVE
     ) {
 
         if (modelItem?.hide == true) {
@@ -30,7 +30,6 @@ class AdmobAdManger(
         }
 
         modelItem?.apply {
-
             if (id != "") {
                 if (ad_format == "banner") {
                     AdmobBannerAd(context, bannerAdContainer)
@@ -60,8 +59,8 @@ class AdmobAdManger(
 
     }
 
-    private fun setupDefaultLayout(default_ad_format: String) {
-        if (default_ad_format == "banner") {
+    private fun setupDefaultLayout(default_ad_format: DefaultAdPlacement) {
+        if (default_ad_format == DefaultAdPlacement.BANNER) {
             AdmobBannerAd(context, bannerAdContainer)
                 .setSkeletonColor(skeletonColor)
                 .loadBannerAd("", 2, position)
@@ -100,4 +99,9 @@ class AdmobAdManger(
         return this
     }
 
+}
+
+enum class DefaultAdPlacement {
+    NATIVE,
+    BANNER
 }
