@@ -11,10 +11,11 @@ data class RemoteModel(
     val ad_format: String = "",
     @SerializedName("ad_type")
     val ad_type: Int = 3,
-    @SerializedName("cta_color")
-    val cta_color: String = "#F42727",
     @SerializedName("hide")
-    val hide: Boolean = false
+    val hide: Boolean = false,
+    @SerializedName("cta_color")
+    val cta_color: String = "#F42727"
+
 
 ) {
     override fun toString(): String {

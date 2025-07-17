@@ -1,5 +1,6 @@
 package com.review.nativesapplications
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -8,6 +9,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.admobads.AdmobAdManger
 import com.admobads.DefaultAdPlacement
+import com.admobads.ads.AdmobInterstitialAd
+import com.admobads.ads.AdmobInterstitialAd.showInterAd
 import com.admobads.data.RemoteModel
 import com.google.android.gms.ads.MobileAds
 import com.review.nativesapplications.databinding.ActivityMainBinding
@@ -31,19 +34,30 @@ class MainActivity : AppCompatActivity() {
 
         MobileAds.initialize(this)
 
+        AdmobInterstitialAd.setLoadingDialogBgColor("#FF0000".toColorInt())
+        AdmobInterstitialAd.setLoadingDialogTextColor(Color.WHITE)
+
+        AdmobInterstitialAd.initValues(2, 3, "ca-app-pub-3940256099942544/1033173712")
+
+        binding.continueBtn.setOnClickListener {
+            showInterAd {
+
+            }
+        }
+
         AdmobAdManger(
             this,
             binding.nativeAd
         )
 
-            .setTextColor("#FF0000".toColorInt() , "#FF0000".toColorInt())
+            .setTextColor("#FF0000".toColorInt(), "#FF0000".toColorInt())
             .loadAd(
                 RemoteModel(
                     id = "ca-app-pub-3940256099942544/1044960115",
                     ad_format = "native",
                     ad_type = 1,
-                    cta_color = "#F42727",
-                    hide = false
+                    hide = false,
+                    cta_color = "#F42727"
                 ),
                 DefaultAdPlacement.BANNER
             )

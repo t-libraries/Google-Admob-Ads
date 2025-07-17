@@ -35,6 +35,10 @@ android {
         baseline = file("lint-baseline.xml")
         resourcePrefix 'tlib_'
     }
+
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 ext {

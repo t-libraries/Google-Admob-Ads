@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.FrameLayout
 import androidx.core.graphics.toColorInt
 import com.admobads.ads.AdmobBannerAd
+import com.admobads.ads.AdmobInterstitialAd
 import com.admobads.ads.AdmobNativeAd
 import com.admobads.ads.BannerPosition
 import com.admobads.data.RemoteModel
@@ -19,10 +20,14 @@ class AdmobAdManger(
     private var bodytextColor: Int = 0
     private var headingtextColor: Int = 0
     private var position: BannerPosition = BannerPosition.BOTTOM
+    private var isPurchased = false
 
     fun loadAd(
         modelItem: RemoteModel?, default_ad_format: DefaultAdPlacement = DefaultAdPlacement.NATIVE
     ) {
+
+        if (isPurchased)
+            return
 
         if (modelItem?.hide == true) {
             bannerAdContainer.visibility = View.GONE
@@ -59,6 +64,11 @@ class AdmobAdManger(
 
     }
 
+    fun isPurchased(isPurchased: Boolean = false) {
+        this.isPurchased = isPurchased
+        AdmobInterstitialAd.isPurchased(isPurchased)
+    }
+
     private fun setupDefaultLayout(default_ad_format: DefaultAdPlacement) {
         if (default_ad_format == DefaultAdPlacement.BANNER) {
             AdmobBannerAd(context, bannerAdContainer)
@@ -76,7 +86,6 @@ class AdmobAdManger(
                 .load()
         }
     }
-
 
     fun setCtaPostion(ctaPosition: String): AdmobAdManger {
         this.ctaPosition = ctaPosition
@@ -98,6 +107,7 @@ class AdmobAdManger(
         this.skeletonColor = color
         return this
     }
+
 
 }
 
