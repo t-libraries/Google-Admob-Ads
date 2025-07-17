@@ -1,6 +1,7 @@
 package com.admobads.ads;
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
@@ -217,16 +218,26 @@ public class AdmobNativeAd {
 
 
         //TextViews
-        if (bodytextColor != 0) {
+        if (this.bodytextColor != null && this.bodytextColor > 0) {
             TextView bodyText = (TextView) adView.getBodyView();
-            assert bodyText != null;
-            bodyText.setTextColor(ctx.getResources().getColor(bodytextColor));
+            if (bodyText != null) {
+                try {
+                    bodyText.setTextColor(bodytextColor);
+                } catch (Exception e) {
+                    Log.e(TAG, "Invalid body text color resource ID: " + this.bodytextColor, e);
+                }
+            }
         }
 
-        if (headingtextColor != 0) {
+        if (headingtextColor != 0 && this.headingtextColor > 0) {
             TextView headlineView = (TextView) adView.getHeadlineView();
             assert headlineView != null;
-            headlineView.setTextColor(ctx.getResources().getColor(headingtextColor));
+
+            try {
+                headlineView.setTextColor(headingtextColor);
+            } catch (Exception e) {
+                Log.e(TAG, "Invalid body text color resource ID: " + this.headingtextColor, e);
+            }
         }
 
 
