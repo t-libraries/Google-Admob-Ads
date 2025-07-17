@@ -3,6 +3,7 @@ package com.review.nativesapplications
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.toColorInt
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.admobads.AdmobAdManger
@@ -34,9 +35,11 @@ class MainActivity : AppCompatActivity() {
             this,
             binding.nativeAd
         )
+
+            .setTextColor("#FF0000".toColorInt() , "#FF0000".toColorInt())
             .loadAd(
                 RemoteModel(
-                    id = "",
+                    id = "ca-app-pub-3940256099942544/1044960115",
                     ad_format = "native",
                     ad_type = 1,
                     cta_color = "#F42727",

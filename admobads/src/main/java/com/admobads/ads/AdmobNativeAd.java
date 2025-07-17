@@ -218,26 +218,28 @@ public class AdmobNativeAd {
 
 
         //TextViews
-        if (this.bodytextColor != null && this.bodytextColor > 0) {
+        if (bodytextColor != 0) {
             TextView bodyText = (TextView) adView.getBodyView();
-            if (bodyText != null) {
-                try {
-                    bodyText.setTextColor(bodytextColor);
-                } catch (Exception e) {
-                    Log.e(TAG, "Invalid body text color resource ID: " + this.bodytextColor, e);
-                }
+            assert bodyText != null;
+
+            try {
+                bodyText.setTextColor(bodytextColor);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
         }
 
-        if (headingtextColor != 0 && this.headingtextColor > 0) {
+        if (headingtextColor != 0) {
             TextView headlineView = (TextView) adView.getHeadlineView();
             assert headlineView != null;
 
             try {
                 headlineView.setTextColor(headingtextColor);
             } catch (Exception e) {
-                Log.e(TAG, "Invalid body text color resource ID: " + this.headingtextColor, e);
+                e.printStackTrace();
             }
+
         }
 
 
