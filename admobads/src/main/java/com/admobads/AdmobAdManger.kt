@@ -30,6 +30,9 @@ class AdmobAdManger(
     private var headingtextColor: Int = 0
     private var position: BannerPosition = BannerPosition.BOTTOM
 
+    private var nativeAdMarginStart = 0
+    private var nativeAdMarginEnd = 0
+
     fun loadAd(
         modelItem: RemoteModel?, default_ad_format: DefaultAdPlacement = DefaultAdPlacement.NATIVE
     ) {
@@ -57,6 +60,7 @@ class AdmobAdManger(
                         ad_type,
                         cta_color
                     )
+                        .setMargintoNative(nativeAdMarginStart , nativeAdMarginEnd)
                         .setSkeltonColor(skeletonColor)
                         .setCtaButtonPosition(ctaPosition)
                         .setTextColor(bodytextColor, headingtextColor)
@@ -109,6 +113,13 @@ class AdmobAdManger(
     fun setSkeltonColor(color: Int): AdmobAdManger {
         this.skeletonColor = color
         return this
+    }
+
+    fun setMargintoNative(start: Int, end: Int): AdmobAdManger {
+        this.nativeAdMarginStart = start
+        this.nativeAdMarginEnd = end
+        return this
+
     }
 
 }

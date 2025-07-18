@@ -50,13 +50,15 @@ class MainActivity : AppCompatActivity() {
             binding.nativeAd
         )
             .setTextColor("#FF0000".toColorInt(), "#FF0000".toColorInt())
+            .setMargintoNative(10 , 10)
             .loadAd(
                 RemoteModel(
-                    id = "ca-app-pub-3940256099942544/1044960115",
-                    ad_format = "native",
-                    ad_type = 1,
-                    hide = false,
-                    cta_color = "#F42727"
+                    "ca-app-pub-3940256099942544/1044960115",
+                    "native",
+                    1,
+                    false,
+                    "#FFC0CB"
+
                 ),
                 DefaultAdPlacement.BANNER
             )

@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -38,6 +40,9 @@ public class AdmobNativeAd {
     private Integer headingtextColor = 0;
     private Integer skeltonColor = 0;
     private Integer backgroundcolor = 0;
+    private Integer marginstart = 0;
+    private Integer marginend = 0;
+
 
 
     private String TAG = "AdNativeOnDemand";
@@ -53,6 +58,12 @@ public class AdmobNativeAd {
     public AdmobNativeAd setTextColor(Integer bodytextColor, Integer headingtextColor) {
         this.bodytextColor = bodytextColor;
         this.headingtextColor = headingtextColor;
+        return this;
+    }
+
+    public AdmobNativeAd setMargintoNative(Integer marginstart, Integer marginend) {
+        this.marginstart = marginstart;
+        this.marginend = marginend;
         return this;
     }
 
@@ -96,7 +107,6 @@ public class AdmobNativeAd {
     }
 
     private void setupNativeContainer(Integer adType) {
-        // Remove any existing views in the container
         nativeAdContainer.removeAllViews();
         AdType type = AdType.fromInt(adType);
         View loadingView = getloadingtype(adType);
@@ -106,13 +116,40 @@ public class AdmobNativeAd {
             skeletonLayout.setSkeletonColor(skeltonColor);
         }
 
-        if (backgroundcolor != 0)
+        if (backgroundcolor != 0) {
             loadingView.findViewById(R.id.skeletonLayout).setBackgroundColor(ctx.getResources().getColor(backgroundcolor));
+        }
 
-        // Add the loading view to the container
-        nativeAdContainer.addView(loadingView);
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ctx.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int screenWidth = displayMetrics.widthPixels;
 
-        // Set background color
+        Resources resources = ctx.getResources();
+        float density = resources.getDisplayMetrics().density;
+        int startMarginPx = (int) (marginstart * density);
+        int endMarginPx = (int) (marginend * density);
+
+        int containerWidth = screenWidth - (startMarginPx + endMarginPx);
+
+        FrameLayout.LayoutParams containerParams = (FrameLayout.LayoutParams) nativeAdContainer.getLayoutParams();
+        if (containerParams == null) {
+            containerParams = new FrameLayout.LayoutParams(
+                    containerWidth,
+                    FrameLayout.LayoutParams.WRAP_CONTENT
+            );
+        } else {
+            containerParams.width = containerWidth;
+        }
+
+        containerParams.gravity = Gravity.CENTER_HORIZONTAL;
+        nativeAdContainer.setLayoutParams(containerParams);
+
+        FrameLayout.LayoutParams loadingViewParams = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+        );
+        nativeAdContainer.addView(loadingView, loadingViewParams);
+
         nativeAdContainer.setBackgroundColor(Color.parseColor("#00000000"));
     }
 

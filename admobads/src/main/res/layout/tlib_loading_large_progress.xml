@@ -6,9 +6,10 @@
 
     <com.admobads.loading.skeleton.layout.SkeletonConstraintLayout
         android:id="@+id/skeletonLayout"
-        android:layout_width="410dp"
-        android:layout_height="288dp"
+        android:layout_width="match_parent"
+        android:layout_height="269dp"
         android:paddingBottom="@dimen/_5sdp"
+        android:layout_margin="@dimen/_8sdp"
         app:clipToText="false"
         app:customDuration="1000"
         app:layout_constraintBottom_toBottomOf="parent"

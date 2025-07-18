@@ -13,7 +13,6 @@
             android:layout_width="match_parent"
             android:layout_height="210dp"
             android:layout_centerInParent="true"
-            android:paddingVertical="@dimen/_8sdp"
             android:paddingHorizontal="@dimen/_6sdp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -31,6 +30,7 @@
                 android:backgroundTint="#2972EA"
                 android:gravity="center"
                 android:elevation="0dp"
+                android:layout_marginTop="@dimen/_8sdp"
                 android:lines="1"
                 android:textColor="@color/tlib_white"
                 android:textSize="@dimen/_12sdp"
@@ -52,6 +52,7 @@
                     android:id="@+id/media_view"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -63,21 +64,19 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/middle"
                 android:layout_width="0dp"
-                android:layout_marginTop="@dimen/_8sdp"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/cta"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/cta"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintWidth_percent="0.55"
-                android:layout_marginBottom="@dimen/_10sdp"
                 app:layout_constraintStart_toEndOf="@+id/mediacontainer"
-                >
+                app:layout_constraintTop_toBottomOf="@+id/cta"
+                app:layout_constraintWidth_percent="0.55">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="130dp"
-                    android:minHeight="130dp"
                     android:background="@android:color/transparent"
+                    android:minHeight="130dp"
                     android:orientation="horizontal"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -166,7 +165,7 @@
                             android:layout_height="@dimen/_17sdp"
                             android:layout_gravity="center_vertical"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" >
+                            app:layout_constraintTop_toTopOf="parent">
 
                             <TextView
                                 android:id="@+id/ad_notification_view"
@@ -234,8 +233,8 @@
                             android:id="@+id/body"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="@dimen/_4sdp"
                             android:layout_marginTop="@dimen/_3sdp"
+                            android:layout_marginEnd="@dimen/_4sdp"
                             android:gravity="top"
                             android:lines="2"
                             android:maxLines="2"
