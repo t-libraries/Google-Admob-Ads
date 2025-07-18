@@ -15,12 +15,20 @@ class AdmobAdManger(
     private val bannerAdContainer: FrameLayout
 ) {
 
+    companion object {
+        private var isPurchased = false
+
+        fun isPurchased(value: Boolean = false) {
+            isPurchased = value
+            AdmobInterstitialAd.isPurchased(value)
+        }
+    }
+
     private var skeletonColor: Int = "#E6E6E6".toColorInt()
     private var ctaPosition: String = "bottom"
     private var bodytextColor: Int = 0
     private var headingtextColor: Int = 0
     private var position: BannerPosition = BannerPosition.BOTTOM
-    private var isPurchased = false
 
     fun loadAd(
         modelItem: RemoteModel?, default_ad_format: DefaultAdPlacement = DefaultAdPlacement.NATIVE
@@ -64,11 +72,6 @@ class AdmobAdManger(
 
     }
 
-    fun isPurchased(isPurchased: Boolean = false) {
-        this.isPurchased = isPurchased
-        AdmobInterstitialAd.isPurchased(isPurchased)
-    }
-
     private fun setupDefaultLayout(default_ad_format: DefaultAdPlacement) {
         if (default_ad_format == DefaultAdPlacement.BANNER) {
             AdmobBannerAd(context, bannerAdContainer)
@@ -107,7 +110,6 @@ class AdmobAdManger(
         this.skeletonColor = color
         return this
     }
-
 
 }
 

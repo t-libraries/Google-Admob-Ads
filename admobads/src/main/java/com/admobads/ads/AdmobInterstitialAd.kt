@@ -5,8 +5,10 @@ import android.app.Dialog
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.nfc.Tag
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.KeyEvent
 import androidx.core.graphics.drawable.toDrawable
 import com.admobads.ads.databinding.TlibAdLoadingDialogBinding
@@ -22,12 +24,16 @@ import androidx.core.graphics.toColorInt
 object AdmobInterstitialAd {
     private var splashInterstitialAd : InterstitialAd? = null
 
+    private var TAG = "AdmobInterstitialAd_"
+
     private var mInterstitialAd: InterstitialAd? = null
     private var isPreviousAdLoading = false
     private var isPurchased = false
     private var inter_counter_start = 2
     private var inter_counter_gap = 3
     private var inside_inter_ad_id = ""
+
+    private var shouldLoadAd = false
 
     private var dialogBackgroundColor = "#F8F8F8".toColorInt()
     private var dialogTextColor = Color.BLACK
@@ -50,19 +56,34 @@ object AdmobInterstitialAd {
         inter_counter_start: Int = 2,
         inter_counter_gap: Int = 3,
         inside_inter_ad_id: String
+
     ) {
         this.inter_counter_start = inter_counter_start
         this.inter_counter_gap = inter_counter_gap
         this.inside_inter_ad_id = inside_inter_ad_id
+
+        if (inter_counter_start == 0){
+            this.inter_counter_start = inter_counter_gap
+        }
+
+        if (inter_counter_start == 0 && inter_counter_gap ==0){
+            shouldLoadAd = false
+        }
+        else {
+            shouldLoadAd = true
+        }
+
     }
 
     fun loadSplashInter(ctx: Activity, id: String) {
         if (!isNetworkAvailable(ctx)) {
             return
         }
+
         if (splashInterstitialAd != null) {
             return
         }
+
         val callback = object : InterstitialAdLoadCallback() {
             override fun onAdLoaded(interstitialAd: InterstitialAd) {
                 isPreviousAdLoading = false
@@ -85,10 +106,12 @@ object AdmobInterstitialAd {
             callBack.invoke()
             return
         }
+
         if (splashInterstitialAd == null) {
             callBack.invoke()
             return
         }
+
         val dialog = dialogAdLoading()
         Handler(Looper.getMainLooper()).postDelayed({
             dialog.dismiss()
@@ -115,6 +138,11 @@ object AdmobInterstitialAd {
 
 
     fun load(ctx: Activity, id: String) {
+
+        if (!shouldLoadAd){
+            return
+        }
+
         if (!isNetworkAvailable(ctx)) {
             return
         }
@@ -125,10 +153,12 @@ object AdmobInterstitialAd {
             override fun onAdLoaded(interstitialAd: InterstitialAd) {
                 isPreviousAdLoading = false
                 mInterstitialAd = interstitialAd
+                Log.d(TAG , "AdmobInterstitialAd: onAdLoaded")
             }
 
             override fun onAdFailedToLoad(adError: LoadAdError) {
                 isPreviousAdLoading = false
+                Log.d(TAG , "AdmobInterstitialAd: onAdFailedToLoad")
             }
         }
         if (!isPreviousAdLoading) {
@@ -145,7 +175,7 @@ object AdmobInterstitialAd {
         }
         if (mInterstitialAd == null) {
             inter_counter_start -= 1
-            if (inter_counter_start.toInt() <= 1) {
+            if (inter_counter_start <= 1) {
                 inter_counter_start = inter_counter_gap
                 load(this, inside_inter_ad_id)
             }
@@ -230,7 +260,7 @@ object AdmobInterstitialAd {
 
         dialog.setOnKeyListener { _, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
-                return@setOnKeyListener true // Consume the event (prevent closing)
+                return@setOnKeyListener true
             }
             false
         }
