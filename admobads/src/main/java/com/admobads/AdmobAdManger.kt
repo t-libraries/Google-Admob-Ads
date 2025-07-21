@@ -90,6 +90,10 @@ class AdmobAdManger(
                 3,
                 "#00ff00"
             )
+                .setMargintoNative(nativeAdMarginStart , nativeAdMarginEnd)
+                .setSkeltonColor(skeletonColor)
+                .setCtaButtonPosition(ctaPosition)
+                .setTextColor(bodytextColor, headingtextColor)
                 .load()
         }
     }
