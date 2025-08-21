@@ -2,15 +2,16 @@ package com.admobads.ads
 
 import android.app.Activity
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.nfc.Tag
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.KeyEvent
 import androidx.core.graphics.drawable.toDrawable
+import androidx.core.graphics.toColorInt
 import com.admobads.ads.databinding.TlibAdLoadingDialogBinding
 import com.admobads.ads.utils.isNetworkAvailable
 import com.google.android.gms.ads.AdError
@@ -19,10 +20,9 @@ import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
-import androidx.core.graphics.toColorInt
 
 object AdmobInterstitialAd {
-    private var splashInterstitialAd : InterstitialAd? = null
+    private var splashInterstitialAd: InterstitialAd? = null
 
     private var TAG = "AdmobInterstitialAd_"
 
@@ -53,6 +53,7 @@ object AdmobInterstitialAd {
     }
 
     fun initValues(
+        context: Context,
         inter_counter_start: Int = 2,
         inter_counter_gap: Int = 3,
         inside_inter_ad_id: String
@@ -62,25 +63,33 @@ object AdmobInterstitialAd {
         this.inter_counter_gap = inter_counter_gap
         this.inside_inter_ad_id = inside_inter_ad_id
 
-        if (inter_counter_start == 0){
+        if (inter_counter_start == 0) {
             this.inter_counter_start = inter_counter_gap
         }
 
-        if (inter_counter_start == 0 && inter_counter_gap ==0){
+        if (inter_counter_start == 0 && inter_counter_gap == 0) {
             shouldLoadAd = false
-        }
-        else {
+        } else {
             shouldLoadAd = true
+            if (inter_counter_start == 1){
+                load(context , inside_inter_ad_id)
+            }
         }
 
     }
 
-    fun loadSplashInter(ctx: Activity, id: String) {
+    fun loadSplashInter(
+        ctx: Activity, id: String,
+        onAdLoaded: () -> Unit,
+        onAdFailedToLoad: () -> Unit,
+    ) {
         if (!isNetworkAvailable(ctx)) {
+            onAdFailedToLoad.invoke()
             return
         }
 
         if (splashInterstitialAd != null) {
+            onAdLoaded.invoke()
             return
         }
 
@@ -88,10 +97,12 @@ object AdmobInterstitialAd {
             override fun onAdLoaded(interstitialAd: InterstitialAd) {
                 isPreviousAdLoading = false
                 splashInterstitialAd = interstitialAd
+                onAdLoaded.invoke()
             }
 
             override fun onAdFailedToLoad(adError: LoadAdError) {
                 isPreviousAdLoading = false
+                onAdFailedToLoad.invoke()
             }
         }
         if (!isPreviousAdLoading) {
@@ -118,6 +129,7 @@ object AdmobInterstitialAd {
             splashInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
                 override fun onAdDismissedFullScreenContent() {
                     super.onAdDismissedFullScreenContent()
+                    splashInterstitialAd = null
                     callBack.invoke()
                 }
 
@@ -137,28 +149,42 @@ object AdmobInterstitialAd {
     }
 
 
-    fun load(ctx: Activity, id: String) {
+    fun load(ctx: Context, id: String) {
 
-        if (!shouldLoadAd){
+        if (isPurchased) {
+            return
+        }
+
+        if (!shouldLoadAd) {
             return
         }
 
         if (!isNetworkAvailable(ctx)) {
             return
         }
+
         if (mInterstitialAd != null) {
             return
         }
+
+        if (splashInterstitialAd != null) {
+            mInterstitialAd = splashInterstitialAd
+            splashInterstitialAd = null
+            return
+        }
+
+
+
         val callback = object : InterstitialAdLoadCallback() {
             override fun onAdLoaded(interstitialAd: InterstitialAd) {
                 isPreviousAdLoading = false
                 mInterstitialAd = interstitialAd
-                Log.d(TAG , "AdmobInterstitialAd: onAdLoaded")
+                Log.d(TAG, "AdmobInterstitialAd: onAdLoaded")
             }
 
             override fun onAdFailedToLoad(adError: LoadAdError) {
                 isPreviousAdLoading = false
-                Log.d(TAG , "AdmobInterstitialAd: onAdFailedToLoad")
+                Log.d(TAG, "AdmobInterstitialAd: onAdFailedToLoad")
             }
         }
         if (!isPreviousAdLoading) {
@@ -175,13 +201,14 @@ object AdmobInterstitialAd {
         }
         if (mInterstitialAd == null) {
             inter_counter_start -= 1
-            if (inter_counter_start <= 1) {
+            if (inter_counter_start <= 2) {
                 inter_counter_start = inter_counter_gap
                 load(this, inside_inter_ad_id)
             }
             callBack.invoke()
             return
         }
+
         val dialog = dialogAdLoading()
         Handler(Looper.getMainLooper()).postDelayed({
             dialog.dismiss()
@@ -214,7 +241,7 @@ object AdmobInterstitialAd {
         }
         if (mInterstitialAd == null) {
             inter_counter_start -= 1
-            if (inter_counter_start.toInt() <= 1) {
+            if (inter_counter_start <= 2) {
                 inter_counter_start = inter_counter_gap
                 load(this, inside_inter_ad_id)
             }

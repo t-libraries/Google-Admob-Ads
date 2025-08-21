@@ -17,6 +17,7 @@
             android:layout_centerInParent="true"
             android:background="@android:color/transparent"
             android:paddingHorizontal="@dimen/_6sdp"
+            android:layoutDirection="ltr"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

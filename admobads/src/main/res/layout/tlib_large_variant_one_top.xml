@@ -19,6 +19,7 @@
                 android:id="@+id/background"
                 android:layout_width="match_parent"
                 android:layout_height="165dp"
+                android:layoutDirection="ltr"
                 android:layout_centerInParent="true"
                 android:paddingHorizontal="@dimen/_8sdp"
                 android:paddingVertical="@dimen/_8sdp"

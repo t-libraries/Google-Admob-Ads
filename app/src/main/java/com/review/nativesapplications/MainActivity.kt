@@ -34,10 +34,8 @@ class MainActivity : AppCompatActivity() {
 
         MobileAds.initialize(this)
 
-        AdmobInterstitialAd.setLoadingDialogBgColor("#FF0000".toColorInt())
-        AdmobInterstitialAd.setLoadingDialogTextColor(Color.WHITE)
 
-        AdmobInterstitialAd.initValues(0, 0, "ca-app-pub-3940256099942544/1033173712")
+        AdmobInterstitialAd.initValues(this , 1, 2, "ca-app-pub-3940256099942544/1033173712")
 
         binding.continueBtn.setOnClickListener {
             showInterAd {
@@ -49,13 +47,13 @@ class MainActivity : AppCompatActivity() {
             this,
             binding.nativeAd
         )
-            .setTextColor("#FF0000".toColorInt(), "#FF0000".toColorInt())
+            .setTextColor("#000000".toColorInt(), "#4E4E4EFF".toColorInt())
             .setMargintoNative(10 , 10)
             .loadAd(
                 RemoteModel(
-                    "ca-app-pub-3940256099942544/1044960115",
-                    "native",
-                    1,
+                    "ca-app-pub-3940256099942544/9214589741",
+                    "banner",
+                    4,
                     false,
                     "#FFC0CB"
 

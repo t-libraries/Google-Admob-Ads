@@ -44,7 +44,6 @@ public class AdmobNativeAd {
     private Integer marginend = 0;
 
 
-
     private String TAG = "AdNativeOnDemand";
 
     public AdmobNativeAd(Activity ctx, FrameLayout nativeAdContainer, String id, Integer type, String buttonColor) {
@@ -203,112 +202,116 @@ public class AdmobNativeAd {
     }
 
     private void bindNativeAd(NativeAd nativeAd, NativeAdView adView) {
-        adView.setHeadlineView(adView.findViewById(R.id.primary));
-        adView.setBodyView(adView.findViewById(R.id.body));
-        adView.setCallToActionView(adView.findViewById(R.id.cta));
-        adView.setIconView(adView.findViewById(R.id.icon));
-        adView.setStarRatingView(adView.findViewById(R.id.rating_bar));
-        adView.setMediaView(adView.findViewById(R.id.media_view));
+        try {
+            adView.setHeadlineView(adView.findViewById(R.id.primary));
+            adView.setBodyView(adView.findViewById(R.id.body));
+            adView.setCallToActionView(adView.findViewById(R.id.cta));
+            adView.setIconView(adView.findViewById(R.id.icon));
+            adView.setStarRatingView(adView.findViewById(R.id.rating_bar));
+            adView.setMediaView(adView.findViewById(R.id.media_view));
 
-        // Set rating
-        AdType adType = AdType.fromInt(type);
+            // Set rating
+            AdType adType = AdType.fromInt(type);
 
-        if (adType != AdType.BANNER) {
-            if (adType != AdType.LARGE_1) {
-                if (nativeAd.getStarRating() == null) {
-                    if (adView.getStarRatingView() != null)
-                        adView.getStarRatingView().setVisibility(View.GONE);
-                } else if (adView.getStarRatingView() instanceof RatingBar) {
-                    adView.getStarRatingView().setVisibility(View.VISIBLE);
-                    ((RatingBar) adView.getStarRatingView()).setRating(nativeAd.getStarRating().floatValue());
-                }
-            }
-        }
-
-        // Set icon
-        if (nativeAd.getIcon() != null && adView.getIconView() instanceof ImageView) {
-            adView.getIconView().setVisibility(View.VISIBLE);
-            ((ImageView) adView.getIconView()).setImageDrawable(nativeAd.getIcon().getDrawable());
-        } else if (adView.getIconView() != null) {
-            adView.getIconView().setVisibility(View.GONE);
-        }
-
-        // Set media content
-        if (nativeAd.getMediaContent() != null && adView.getMediaView() != null) {
-            adView.getMediaView().setVisibility(View.VISIBLE);
-            adView.getMediaView().setMediaContent(nativeAd.getMediaContent());
-        }
-
-        // Headline
-        if (adView.getHeadlineView() instanceof TextView) {
-            ((TextView) adView.getHeadlineView()).setText(nativeAd.getHeadline());
-            adView.getHeadlineView().setSelected(true);
-        }
-
-        // Body
-        if (nativeAd.getBody() != null && adView.getBodyView() instanceof TextView) {
-            adView.getBodyView().setVisibility(View.VISIBLE);
-            ((TextView) adView.getBodyView()).setText(nativeAd.getBody());
-        } else if (adView.getBodyView() != null) {
-            adView.getBodyView().setVisibility(View.INVISIBLE);
-        }
-
-
-        //TextViews
-        if (bodytextColor != 0) {
-            TextView bodyText = (TextView) adView.getBodyView();
-            assert bodyText != null;
-
-            try {
-                bodyText.setTextColor(bodytextColor);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
-
-        if (headingtextColor != 0) {
-            TextView headlineView = (TextView) adView.getHeadlineView();
-            assert headlineView != null;
-
-            try {
-                headlineView.setTextColor(headingtextColor);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
-
-
-        // Call to action
-        if (nativeAd.getCallToAction() != null && adView.getCallToActionView() instanceof AppCompatButton) {
-            adView.getCallToActionView().setVisibility(View.VISIBLE);
-            AppCompatButton button = (AppCompatButton) adView.getCallToActionView();
-            button.setText(nativeAd.getCallToAction());
-            int backgroundColor;
-            if (buttonColor != null) {
-                try {
-                    backgroundColor = Color.parseColor(buttonColor.trim());
-                } catch (Exception e1) {
-                    try {
-                        buttonColor = "#" + buttonColor.trim();
-                        backgroundColor = Color.parseColor(buttonColor);
-                    } catch (Exception e2) {
-                        backgroundColor = Color.parseColor("#008000"); // fallback color
+            if (adType != AdType.BANNER) {
+                if (adType != AdType.LARGE_1) {
+                    if (nativeAd.getStarRating() == null) {
+                        if (adView.getStarRatingView() != null)
+                            adView.getStarRatingView().setVisibility(View.GONE);
+                    } else if (adView.getStarRatingView() instanceof RatingBar) {
+                        adView.getStarRatingView().setVisibility(View.VISIBLE);
+                        ((RatingBar) adView.getStarRatingView()).setRating(nativeAd.getStarRating().floatValue());
                     }
                 }
-            } else {
-                backgroundColor = Color.parseColor("#008000"); // default green
+            }
+
+            // Set icon
+            if (nativeAd.getIcon() != null && adView.getIconView() != null && adView.getIconView() instanceof ImageView) {
+                adView.getIconView().setVisibility(View.VISIBLE);
+                ((ImageView) adView.getIconView()).setImageDrawable(nativeAd.getIcon().getDrawable());
+            } else if (adView.getIconView() != null) {
+                adView.getIconView().setVisibility(View.GONE);
+            }
+
+            // Set media content
+            if (nativeAd.getMediaContent() != null && adView.getMediaView() != null) {
+                adView.getMediaView().setVisibility(View.VISIBLE);
+                adView.getMediaView().setMediaContent(nativeAd.getMediaContent());
+            }
+
+            // Headline
+            if (adView.getHeadlineView() instanceof TextView) {
+                ((TextView) adView.getHeadlineView()).setText(nativeAd.getHeadline());
+                adView.getHeadlineView().setSelected(true);
+            }
+
+            // Body
+            if (nativeAd.getBody() != null && adView.getBodyView() instanceof TextView) {
+                adView.getBodyView().setVisibility(View.VISIBLE);
+                ((TextView) adView.getBodyView()).setText(nativeAd.getBody());
+            } else if (adView.getBodyView() != null) {
+                adView.getBodyView().setVisibility(View.INVISIBLE);
             }
 
 
-            Drawable drawable = button.getBackground();
-            drawable.setColorFilter(backgroundColor, android.graphics.PorterDuff.Mode.SRC);
-            button.setBackground(drawable);
-        } else if (adView.getCallToActionView() != null) {
-            adView.getCallToActionView().setVisibility(View.INVISIBLE);
+            //TextViews
+            if (bodytextColor != 0) {
+                TextView bodyText = (TextView) adView.getBodyView();
+                assert bodyText != null;
+
+                try {
+                    bodyText.setTextColor(bodytextColor);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            if (headingtextColor != 0) {
+                TextView headlineView = (TextView) adView.getHeadlineView();
+                assert headlineView != null;
+
+                try {
+                    headlineView.setTextColor(headingtextColor);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+
+            // Call to action
+            if (nativeAd.getCallToAction() != null && adView.getCallToActionView() instanceof AppCompatButton) {
+                adView.getCallToActionView().setVisibility(View.VISIBLE);
+                AppCompatButton button = (AppCompatButton) adView.getCallToActionView();
+                button.setText(nativeAd.getCallToAction());
+                int backgroundColor;
+                if (buttonColor != null) {
+                    try {
+                        backgroundColor = Color.parseColor(buttonColor.trim());
+                    } catch (Exception e1) {
+                        try {
+                            buttonColor = "#" + buttonColor.trim();
+                            backgroundColor = Color.parseColor(buttonColor);
+                        } catch (Exception e2) {
+                            backgroundColor = Color.parseColor("#008000"); // fallback color
+                        }
+                    }
+                } else {
+                    backgroundColor = Color.parseColor("#008000"); // default green
+                }
+
+
+                Drawable drawable = button.getBackground();
+                drawable.setColorFilter(backgroundColor, android.graphics.PorterDuff.Mode.SRC);
+                button.setBackground(drawable);
+            } else if (adView.getCallToActionView() != null) {
+                adView.getCallToActionView().setVisibility(View.INVISIBLE);
+            }
+            adView.setNativeAd(nativeAd);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        adView.setNativeAd(nativeAd);
     }
 
     public View getloadingtype(Integer type) {

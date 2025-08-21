@@ -9,9 +9,11 @@ import com.admobads.ads.AdmobInterstitialAd
 import com.admobads.ads.AdmobNativeAd
 import com.admobads.ads.BannerPosition
 import com.admobads.data.RemoteModel
+import com.google.android.material.card.MaterialCardView
 
 class AdmobAdManger(
     private val context: Activity,
+    private val adContainer: MaterialCardView,
     private val bannerAdContainer: FrameLayout
 ) {
 
@@ -34,14 +36,17 @@ class AdmobAdManger(
     private var nativeAdMarginEnd = 0
 
     fun loadAd(
-        modelItem: RemoteModel?, default_ad_format: DefaultAdPlacement = DefaultAdPlacement.NATIVE
+        modelItem: RemoteModel?, default_ad_format: DefaultAdPlacement = DefaultAdPlacement.BANNER
     ) {
 
-        if (isPurchased)
+        if (isPurchased) {
+            adContainer.visibility = View.GONE
             return
+        }
 
         if (modelItem?.hide == true) {
             bannerAdContainer.visibility = View.GONE
+            adContainer.visibility = View.GONE
             return
         }
 
@@ -60,7 +65,7 @@ class AdmobAdManger(
                         ad_type,
                         cta_color
                     )
-                        .setMargintoNative(nativeAdMarginStart , nativeAdMarginEnd)
+                        .setMargintoNative(nativeAdMarginStart, nativeAdMarginEnd)
                         .setSkeltonColor(skeletonColor)
                         .setCtaButtonPosition(ctaPosition)
                         .setTextColor(bodytextColor, headingtextColor)
@@ -90,7 +95,7 @@ class AdmobAdManger(
                 3,
                 "#00ff00"
             )
-                .setMargintoNative(nativeAdMarginStart , nativeAdMarginEnd)
+                .setMargintoNative(nativeAdMarginStart, nativeAdMarginEnd)
                 .setSkeltonColor(skeletonColor)
                 .setCtaButtonPosition(ctaPosition)
                 .setTextColor(bodytextColor, headingtextColor)
@@ -103,7 +108,7 @@ class AdmobAdManger(
         return this
     }
 
-    fun setTextColor(bodytextColor: Int, headingtextColor: Int): AdmobAdManger {
+    fun setTextColor(headingtextColor: Int, bodytextColor: Int): AdmobAdManger {
         this.bodytextColor = bodytextColor
         this.headingtextColor = headingtextColor
         return this
