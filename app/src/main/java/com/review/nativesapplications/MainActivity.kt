@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity() {
 
         AdmobAdManger(
             this,
+            binding.nativeContainer,
             binding.nativeAd
         )
             .setTextColor("#000000".toColorInt(), "#4E4E4EFF".toColorInt())
