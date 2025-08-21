@@ -14,7 +14,7 @@ import com.google.android.material.card.MaterialCardView
 class AdmobAdManger(
     private val context: Activity,
     private val adContainer: MaterialCardView,
-    private val bannerAdContainer: FrameLayout
+    private val adLayout: FrameLayout
 ) {
 
     companion object {
@@ -45,7 +45,7 @@ class AdmobAdManger(
         }
 
         if (modelItem?.hide == true) {
-            bannerAdContainer.visibility = View.GONE
+            adLayout.visibility = View.GONE
             adContainer.visibility = View.GONE
             return
         }
@@ -53,14 +53,14 @@ class AdmobAdManger(
         modelItem?.apply {
             if (id != "") {
                 if (ad_format == "banner") {
-                    AdmobBannerAd(context, bannerAdContainer)
+                    AdmobBannerAd(context, adLayout)
                         .setSkeletonColor(skeletonColor)
                         .loadBannerAd(id, ad_type, position)
 
                 } else {
                     AdmobNativeAd(
                         context,
-                        bannerAdContainer,
+                        adLayout,
                         id,
                         ad_type,
                         cta_color
@@ -83,14 +83,14 @@ class AdmobAdManger(
 
     private fun setupDefaultLayout(default_ad_format: DefaultAdPlacement) {
         if (default_ad_format == DefaultAdPlacement.BANNER) {
-            AdmobBannerAd(context, bannerAdContainer)
+            AdmobBannerAd(context, adLayout)
                 .setSkeletonColor(skeletonColor)
                 .loadBannerAd("", 2, position)
 
         } else {
             AdmobNativeAd(
                 context,
-                bannerAdContainer,
+                adLayout,
                 "",
                 3,
                 "#00ff00"
