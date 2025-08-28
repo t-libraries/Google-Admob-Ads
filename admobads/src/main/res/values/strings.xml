@@ -1,3 +1,5 @@
 <resources>
-    <string name="tlib_app_name">NativeAdLoader</string>
+    <string name="tlib_app_name" translatable="false">NativeAdLoader</string>
+    <string name="tlib_loading" translatable="false">Loading</string>
+    <string name="tlib_loading_ad" translatable="false">Loading Ad</string>
 </resources>

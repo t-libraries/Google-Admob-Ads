@@ -4,6 +4,7 @@ import android.app.Activity
 import android.view.View
 import android.widget.FrameLayout
 import androidx.core.graphics.toColorInt
+import com.admobads.ads.AdmobAppOpenAd
 import com.admobads.ads.AdmobBannerAd
 import com.admobads.ads.AdmobInterstitialAd
 import com.admobads.ads.AdmobNativeAd
@@ -22,7 +23,8 @@ class AdmobAdManger(
 
         fun isPurchased(value: Boolean = false) {
             isPurchased = value
-            AdmobInterstitialAd.isPurchased(value)
+            AdmobInterstitialAd.setPurchased(value)
+            AdmobAppOpenAd.setPurchased(value)
         }
     }
 

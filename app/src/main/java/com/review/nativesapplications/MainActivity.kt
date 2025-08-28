@@ -9,6 +9,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.admobads.AdmobAdManger
 import com.admobads.DefaultAdPlacement
+import com.admobads.ads.AdmobAppOpenAd
 import com.admobads.ads.AdmobInterstitialAd
 import com.admobads.ads.AdmobInterstitialAd.showInterAd
 import com.admobads.data.RemoteModel
@@ -32,10 +33,20 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        AdmobInterstitialAd.setLoadingDialogTextColor(Color.YELLOW)
+        AdmobInterstitialAd.setLoadingDialogBgColor("#000000".toColorInt())
+
         MobileAds.initialize(this)
 
+        MyApplication.myApplication?.let {
+            AdmobAppOpenAd(
+                it,
+                "ca-app-pub-3940256099942544/9257395921",
+                listOf("MainActivity")
+            )
+        }
 
-        AdmobInterstitialAd.initValues(this , 1, 2, "ca-app-pub-3940256099942544/1033173712")
+        AdmobInterstitialAd.initValues(this, 1, 2, "ca-app-pub-3940256099942544/1033173712")
 
         binding.continueBtn.setOnClickListener {
             showInterAd {
@@ -49,7 +60,7 @@ class MainActivity : AppCompatActivity() {
             binding.nativeAd
         )
             .setTextColor("#000000".toColorInt(), "#4E4E4EFF".toColorInt())
-            .setMargintoNative(10 , 10)
+            .setMargintoNative(10, 10)
             .loadAd(
                 RemoteModel(
                     "ca-app-pub-3940256099942544/9214589741",

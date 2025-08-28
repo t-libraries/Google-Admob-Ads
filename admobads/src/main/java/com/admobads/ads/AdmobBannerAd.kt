@@ -34,6 +34,7 @@ class AdmobBannerAd(
     private var skeltoncolor: Int = 0
     private var backgroundcolor: Int = 0
 
+
     fun setSkeletonColor(color: Int): AdmobBannerAd {
         this.skeltoncolor = color
         return this

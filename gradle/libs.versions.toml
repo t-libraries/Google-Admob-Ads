@@ -1,17 +1,17 @@
 [versions]
-agp = "8.8.2"
-androidxAppcompat = "1.4.0"
+agp = "8.9.1"
+androidxAppcompat = "1.7.1"
 androidxConstraintlayout = "2.2.1"
-androidxEspressoCore = "3.6.1"
+androidxEspressoCore = "3.7.0"
 appcompatVersion = "1.7.1"
-constraintlayoutVersion = "2.1.2"
-espressoCoreVersion = "3.4.0"
+constraintlayoutVersion = "2.2.1"
+espressoCoreVersion = "3.7.0"
 googlePlayServicesAds = "23.6.0"
-gson = "2.11.0"
-kotlin = "2.1.0"
-coreKtx = "1.16.0"
+gson = "2.13.1"
+kotlin = "2.2.10"
+coreKtx = "1.17.0"
 junit = "4.13.2"
-junitVersion = "1.2.1"
+junitVersion = "1.3.0"
 espressoCore = "3.6.1"
 appcompat = "1.7.0"
 material = "1.12.0"
@@ -19,12 +19,13 @@ activity = "1.10.1"
 constraintlayout = "2.2.1"
 playServicesAds = "23.6.0"
 playServicesAdsVersion = "23.0.0"
-runner = "1.6.2"
-runnerVersion = "1.4.0"
+runner = "1.7.0"
+runnerVersion = "1.7.0"
 sdpAndroid = "1.1.1"
 agskeletonloading = "1.2"
 jetbrainsKotlinJvm = "2.1.0"
-sdpAndroidVersion = "1.1.0"
+sdpAndroidVersion = "1.1.1"
+lifecycleRuntimeKtx = "2.9.2"
 
 [libraries]
 androidx-appcompat-v171 = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
@@ -46,6 +47,8 @@ play-services-ads-v2300 = { module = "com.google.android.gms:play-services-ads",
 sdp-android = { module = "com.intuit.sdp:sdp-android", version.ref = "sdpAndroid" }
 agskeletonloading = { module = "com.github.AgnaldoNP:AGSkeletonLoading", version.ref = "agskeletonloading" }
 sdp-android-v110 = { module = "com.intuit.sdp:sdp-android", version.ref = "sdpAndroidVersion" }
+androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleRuntimeKtx" }
+androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 
 
 [plugins]

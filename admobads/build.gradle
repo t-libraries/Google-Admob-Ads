@@ -6,10 +6,10 @@ plugins {
 
 android {
     namespace 'com.admobads.ads'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
-        minSdk 24
+        minSdk 21
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -118,7 +118,9 @@ dependencies {
     implementation libs.androidx.constraintlayout.v221
     implementation libs.sdp.android.v110
 
-
+    //lifecycle
+    implementation libs.androidx.lifecycle.runtime.ktx
+    implementation libs.androidx.lifecycle.process
 
     implementation libs.gson
 

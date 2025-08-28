@@ -39,17 +39,19 @@ object AdmobInterstitialAd {
     private var dialogTextColor = Color.BLACK
 
 
-    fun isPurchased(isPurchased: Boolean = false) {
+    fun setPurchased(isPurchased: Boolean = false) {
         this.isPurchased = isPurchased
     }
 
 
     fun setLoadingDialogBgColor(loadingDialogBgColor: Int) {
         this.dialogBackgroundColor = loadingDialogBgColor
+        AdmobAppOpenAd.setDialogBGColor(loadingDialogBgColor)
     }
 
     fun setLoadingDialogTextColor(loadingDialogTextColor: Int) {
         this.dialogTextColor = loadingDialogTextColor
+        AdmobAppOpenAd.setDialogTextColor(loadingDialogTextColor)
     }
 
     fun initValues(
@@ -71,8 +73,8 @@ object AdmobInterstitialAd {
             shouldLoadAd = false
         } else {
             shouldLoadAd = true
-            if (inter_counter_start == 1){
-                load(context , inside_inter_ad_id)
+            if (inter_counter_start == 1) {
+                load(context, inside_inter_ad_id)
             }
         }
 
@@ -130,6 +132,7 @@ object AdmobInterstitialAd {
                 override fun onAdDismissedFullScreenContent() {
                     super.onAdDismissedFullScreenContent()
                     splashInterstitialAd = null
+                    AdmobAppOpenAd.shouldshowAppOpen()
                     callBack.invoke()
                 }
 
@@ -141,10 +144,12 @@ object AdmobInterstitialAd {
                 override fun onAdFailedToShowFullScreenContent(p0: AdError) {
                     super.onAdFailedToShowFullScreenContent(p0)
                     callBack.invoke()
+                    AdmobAppOpenAd.shouldshowAppOpen()
                 }
             }
 
             splashInterstitialAd?.show(this)
+            AdmobAppOpenAd.shouldshowAppOpen(false)
         }, 1500)
     }
 
@@ -172,7 +177,6 @@ object AdmobInterstitialAd {
             splashInterstitialAd = null
             return
         }
-
 
 
         val callback = object : InterstitialAdLoadCallback() {
@@ -216,6 +220,7 @@ object AdmobInterstitialAd {
                 override fun onAdDismissedFullScreenContent() {
                     super.onAdDismissedFullScreenContent()
                     callBack.invoke()
+                    AdmobAppOpenAd.shouldshowAppOpen()
                 }
 
                 override fun onAdShowedFullScreenContent() {
@@ -225,11 +230,13 @@ object AdmobInterstitialAd {
 
                 override fun onAdFailedToShowFullScreenContent(p0: AdError) {
                     super.onAdFailedToShowFullScreenContent(p0)
+                    AdmobAppOpenAd.shouldshowAppOpen()
                     callBack.invoke()
                 }
             }
 
             mInterstitialAd?.show(this)
+            AdmobAppOpenAd.shouldshowAppOpen(false)
         }, 1500)
     }
 
@@ -252,11 +259,12 @@ object AdmobInterstitialAd {
         val dialog = dialogAdLoading()
         Handler(Looper.getMainLooper()).postDelayed({
             dialog.dismiss()
-            intent?.let { startActivity(intent) }
-            if (finish) finish()
             mInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
                 override fun onAdDismissedFullScreenContent() {
                     super.onAdDismissedFullScreenContent()
+                    intent?.let { startActivity(intent) }
+                    if (finish) finish()
+                    AdmobAppOpenAd.shouldshowAppOpen()
 
                 }
 
@@ -267,10 +275,14 @@ object AdmobInterstitialAd {
 
                 override fun onAdFailedToShowFullScreenContent(p0: AdError) {
                     super.onAdFailedToShowFullScreenContent(p0)
+                    intent?.let { startActivity(intent) }
+                    if (finish) finish()
+                    AdmobAppOpenAd.shouldshowAppOpen()
                 }
             }
 
             mInterstitialAd?.show(this)
+            AdmobAppOpenAd.shouldshowAppOpen(false)
         }, 1500)
     }
 
