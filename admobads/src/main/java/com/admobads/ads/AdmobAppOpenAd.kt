@@ -13,9 +13,8 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.toColorInt
-import androidx.lifecycle.Lifecycle.Event.ON_START
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.admobads.ads.utils.isNetworkAvailable
 import com.google.android.gms.ads.AdError
@@ -23,16 +22,12 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.appopen.AppOpenAd
-import kotlin.jvm.javaClass
-import kotlin.let
 
 class AdmobAppOpenAd(
     private val applicationContext: Application,
     private val ad_Id: String,
     private val exceptionalActivities: List<String> = emptyList()
-) :
-    LifecycleObserver,
-    Application.ActivityLifecycleCallbacks {
+) : DefaultLifecycleObserver, Application.ActivityLifecycleCallbacks {
     private var appOpenAd: AppOpenAd? = null
     private var loadCallback: AppOpenAd.AppOpenAdLoadCallback? = null
     private var currentActivity: Activity? = null
@@ -42,8 +37,7 @@ class AdmobAppOpenAd(
     private var isColdStart = true
 
 
-    @OnLifecycleEvent(ON_START)
-    fun onStart() {
+    override fun onStart(owner: LifecycleOwner) {
         try {
             Log.d(TAG, "onStart: Coming Inside $isColdStart")
 
@@ -100,13 +94,23 @@ class AdmobAppOpenAd(
             }
         }
 
-        val request = adRequest
-        ad_Id.let {
-            AppOpenAd.load(
-                applicationContext,
-                it, request, AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT, loadCallback!!
-            )
+        try {
+            val request = adRequest
+            ad_Id.let {
+                loadCallback?.let { it1 ->
+                    AppOpenAd.load(
+                        applicationContext,
+                        ad_Id,
+                        request,
+                        it1
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
+
+
     }
 
 
@@ -153,9 +157,6 @@ class AdmobAppOpenAd(
                 Log.d(LOG_TAG, "onAdShowedFullScreenContent.")
             }
 
-            override fun onAdImpression() {
-                super.onAdImpression()
-            }
         }
         isShowingAd = true
         currentActivity?.let { appOpenAd!!.show(it) }
