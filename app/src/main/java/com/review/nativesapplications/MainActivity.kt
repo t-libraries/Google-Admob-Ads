@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
                 "ca-app-pub-3940256099942544/9257395921")
         }
 
-        AdmobInterstitialAd.initValues(this, 3, 4, "ca-app-pub-3940256099942544/1033173712")
+        AdmobInterstitialAd.initValues(this, 3, 0, "ca-app-pub-3940256099942544/1033173712")
 
         binding.continueBtn.setOnClickListener {
             showInterAd {
