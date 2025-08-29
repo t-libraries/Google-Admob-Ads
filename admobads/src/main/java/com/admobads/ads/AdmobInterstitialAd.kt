@@ -30,7 +30,9 @@ object AdmobInterstitialAd {
     private var isPreviousAdLoading = false
     private var isPurchased = false
     private var inter_counter_start = 2
+    private var inter_counter_start_inside = 2
     private var inter_counter_gap = 3
+    private var inter_counter_gap_inside = 3
     private var inside_inter_ad_id = ""
 
     private var shouldLoadAd = false
@@ -62,7 +64,9 @@ object AdmobInterstitialAd {
 
     ) {
         this.inter_counter_start = inter_counter_start
+        this.inter_counter_start_inside = inter_counter_start
         this.inter_counter_gap = inter_counter_gap
+        this.inter_counter_gap_inside = inter_counter_gap
         this.inside_inter_ad_id = inside_inter_ad_id
 
         if (inter_counter_start == 0) {
@@ -203,15 +207,25 @@ object AdmobInterstitialAd {
             callBack.invoke()
             return
         }
+
+
+
         if (mInterstitialAd == null) {
             inter_counter_start -= 1
-            if (inter_counter_start <= 2) {
-                inter_counter_start = inter_counter_gap
+            Log.d("counterstart" , "If :: $inter_counter_start")
+            if (inter_counter_start <= 3) {
                 load(this, inside_inter_ad_id)
             }
             callBack.invoke()
             return
+        } else {
+            inter_counter_start -= 1
+            Log.d("counterstart" , "Else :: $inter_counter_start")
+            if (inter_counter_start != 0) {
+                return
+            }
         }
+
 
         val dialog = dialogAdLoading()
         Handler(Looper.getMainLooper()).postDelayed({
@@ -219,18 +233,21 @@ object AdmobInterstitialAd {
             mInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
                 override fun onAdDismissedFullScreenContent() {
                     super.onAdDismissedFullScreenContent()
+                    mInterstitialAd = null
+                    inter_counter_start = inter_counter_gap
                     callBack.invoke()
                     AdmobAppOpenAd.shouldshowAppOpen()
                 }
 
                 override fun onAdShowedFullScreenContent() {
                     super.onAdShowedFullScreenContent()
-                    mInterstitialAd = null
                 }
 
                 override fun onAdFailedToShowFullScreenContent(p0: AdError) {
                     super.onAdFailedToShowFullScreenContent(p0)
                     AdmobAppOpenAd.shouldshowAppOpen()
+                    mInterstitialAd = null
+                    inter_counter_start = inter_counter_gap
                     callBack.invoke()
                 }
             }
@@ -248,14 +265,22 @@ object AdmobInterstitialAd {
         }
         if (mInterstitialAd == null) {
             inter_counter_start -= 1
-            if (inter_counter_start <= 2) {
-                inter_counter_start = inter_counter_gap
+            if (inter_counter_start <= 3) {
                 load(this, inside_inter_ad_id)
             }
             intent?.let { startActivity(intent) }
             if (finish) finish()
             return
+        } else {
+            inter_counter_start -= 1
+            if (inter_counter_start != 0) {
+                intent?.let { startActivity(intent) }
+                if (finish) finish()
+                return
+            }
         }
+
+
         val dialog = dialogAdLoading()
         Handler(Looper.getMainLooper()).postDelayed({
             dialog.dismiss()
@@ -264,20 +289,23 @@ object AdmobInterstitialAd {
                     super.onAdDismissedFullScreenContent()
                     intent?.let { startActivity(intent) }
                     if (finish) finish()
+                    inter_counter_start = inter_counter_gap
                     AdmobAppOpenAd.shouldshowAppOpen()
+                    mInterstitialAd = null
 
                 }
 
                 override fun onAdShowedFullScreenContent() {
                     super.onAdShowedFullScreenContent()
-                    mInterstitialAd = null
                 }
 
                 override fun onAdFailedToShowFullScreenContent(p0: AdError) {
                     super.onAdFailedToShowFullScreenContent(p0)
                     intent?.let { startActivity(intent) }
                     if (finish) finish()
+                    inter_counter_start = inter_counter_gap
                     AdmobAppOpenAd.shouldshowAppOpen()
+                    mInterstitialAd = null
                 }
             }
 
