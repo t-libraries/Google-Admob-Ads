@@ -208,20 +208,17 @@ object AdmobInterstitialAd {
             return
         }
 
-
-
         if (mInterstitialAd == null) {
+            callBack.invoke()
             inter_counter_start -= 1
-            Log.d("counterstart" , "If :: $inter_counter_start")
-            if (inter_counter_start <= 3) {
+            if (inter_counter_start <= 2) {
                 load(this, inside_inter_ad_id)
             }
-            callBack.invoke()
             return
         } else {
             inter_counter_start -= 1
-            Log.d("counterstart" , "Else :: $inter_counter_start")
             if (inter_counter_start != 0) {
+                callBack.invoke()
                 return
             }
         }
@@ -233,9 +230,9 @@ object AdmobInterstitialAd {
             mInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
                 override fun onAdDismissedFullScreenContent() {
                     super.onAdDismissedFullScreenContent()
+                    callBack.invoke()
                     mInterstitialAd = null
                     inter_counter_start = inter_counter_gap
-                    callBack.invoke()
                     AdmobAppOpenAd.shouldshowAppOpen()
                 }
 
@@ -245,10 +242,11 @@ object AdmobInterstitialAd {
 
                 override fun onAdFailedToShowFullScreenContent(p0: AdError) {
                     super.onAdFailedToShowFullScreenContent(p0)
+                    callBack.invoke()
                     AdmobAppOpenAd.shouldshowAppOpen()
                     mInterstitialAd = null
                     inter_counter_start = inter_counter_gap
-                    callBack.invoke()
+
                 }
             }
 
@@ -265,7 +263,7 @@ object AdmobInterstitialAd {
         }
         if (mInterstitialAd == null) {
             inter_counter_start -= 1
-            if (inter_counter_start <= 3) {
+            if (inter_counter_start <= 2) {
                 load(this, inside_inter_ad_id)
             }
             intent?.let { startActivity(intent) }

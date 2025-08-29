@@ -1,5 +1,6 @@
 package com.review.nativesapplications
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
@@ -48,7 +49,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.continueBtn.setOnClickListener {
             showInterAd {
-
+                startActivity(Intent(this , BannerAdActivity :: class.java))
             }
         }
 
