@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.admobads.ads.AdmobBannerAd
+import com.admobads.ads.AdmobInterstitialAd.showInterAd
 import com.review.nativesapplications.databinding.ActivityBannerAdBinding
 
 class BannerAdActivity : AppCompatActivity() {
@@ -25,9 +26,11 @@ class BannerAdActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
 
-//        AdmobBannerAd(this, binding.bannercontainer)
-//            .setSkeletonColor(Color.parseColor("#E6E6E6"))
-//            .loadBannerAd("ca-app-pub-3940256099942544/9214589741", "LARGE_BANNER")
+    override fun onBackPressed() {
+        showInterAd {
+            finish()
+        }
     }
 }

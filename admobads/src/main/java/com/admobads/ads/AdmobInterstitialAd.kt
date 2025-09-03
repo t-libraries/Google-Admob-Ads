@@ -74,14 +74,14 @@ object AdmobInterstitialAd {
         }
 
         if (inter_counter_start == 0 && inter_counter_gap == 0) {
-            Log.d(TAG , "Both are 0")
+            Log.d(TAG, "Both are 0")
             shouldLoadAd = false
         } else if (inter_counter_start != 0 && inter_counter_start <= 2) {
-            Log.d(TAG , "inter_counter_start = ${inter_counter_start}")
+            Log.d(TAG, "inter_counter_start = ${inter_counter_start}")
             shouldLoadAd = true
             load(context, inside_inter_ad_id)
         } else {
-            Log.d(TAG , "inter_counter_gap = ${inter_counter_gap}")
+            Log.d(TAG, "inter_counter_gap = ${inter_counter_gap}")
             shouldLoadAd = true
             if (inter_counter_gap != 0 && inter_counter_gap <= 2) {
                 load(context, inside_inter_ad_id)
@@ -214,6 +214,8 @@ object AdmobInterstitialAd {
             return
         }
 
+        Log.d(TAG, "Counter == $inter_counter_start")
+
         if (inter_counter_start != 0 && mInterstitialAd == null) {
             callBack.invoke()
             inter_counter_start -= 1
@@ -222,8 +224,10 @@ object AdmobInterstitialAd {
             }
             return
         } else if (inter_counter_start == 0) {
-            callBack.invoke()
-            return
+            if (mInterstitialAd == null) {
+                callBack.invoke()
+                return
+            }
         } else {
             inter_counter_start -= 1
             if (inter_counter_start > 0) {
