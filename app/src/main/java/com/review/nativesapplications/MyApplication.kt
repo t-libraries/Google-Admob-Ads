@@ -15,10 +15,10 @@ class MyApplication : Application() {
         super.onCreate()
         myApplication = this
 
-        AdmobInterstitialAd.initValues(this, 3, 0, "ca-app-pub-3940256099942544/1033173712")
+        AdmobInterstitialAd.initValues(this, 3, 1, "ca-app-pub-3940256099942544/1033173712")
 
         val appLocale: LocaleListCompat =
-            LocaleListCompat.forLanguageTags("es")
+            LocaleListCompat.forLanguageTags("en")
         AppCompatDelegate.setApplicationLocales(appLocale)
 
     }

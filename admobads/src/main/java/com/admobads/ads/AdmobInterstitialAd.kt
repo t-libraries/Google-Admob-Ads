@@ -1,7 +1,6 @@
 package com.admobads.ads
 
 import android.app.Activity
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -9,10 +8,11 @@ import android.graphics.Color
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.KeyEvent
-import androidx.core.graphics.drawable.toDrawable
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.core.graphics.toColorInt
-import com.admobads.ads.databinding.TlibAdLoadingDialogBinding
 import com.admobads.ads.utils.isNetworkAvailable
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
@@ -20,6 +20,7 @@ import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.android.material.card.MaterialCardView
 
 object AdmobInterstitialAd {
     private var splashInterstitialAd: InterstitialAd? = null
@@ -135,9 +136,9 @@ object AdmobInterstitialAd {
             return
         }
 
-        val dialog = dialogAdLoading()
+        val loadingView = showAdLoadingView()
         Handler(Looper.getMainLooper()).postDelayed({
-            dialog.dismiss()
+            hideAdLoadingView(loadingView)
             splashInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
                 override fun onAdDismissedFullScreenContent() {
                     super.onAdDismissedFullScreenContent()
@@ -237,9 +238,9 @@ object AdmobInterstitialAd {
         }
 
 
-        val dialog = dialogAdLoading()
+        val loadingView = showAdLoadingView()
         Handler(Looper.getMainLooper()).postDelayed({
-            dialog.dismiss()
+            hideAdLoadingView(loadingView)
             mInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
                 override fun onAdDismissedFullScreenContent() {
                     super.onAdDismissedFullScreenContent()
@@ -300,9 +301,9 @@ object AdmobInterstitialAd {
         }
 
 
-        val dialog = dialogAdLoading()
+        val loadingView = showAdLoadingView()
         Handler(Looper.getMainLooper()).postDelayed({
-            dialog.dismiss()
+            hideAdLoadingView(loadingView)
             mInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
                 override fun onAdDismissedFullScreenContent() {
                     super.onAdDismissedFullScreenContent()
@@ -334,25 +335,24 @@ object AdmobInterstitialAd {
         }, 1500)
     }
 
-    fun Activity.dialogAdLoading(): Dialog {
-        val dialog = Dialog(this)
-        val dialogBinding = TlibAdLoadingDialogBinding.inflate(layoutInflater)
-        dialog.setContentView(dialogBinding.root)
-        dialog.setCancelable(false)
-        dialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+    fun Activity.showAdLoadingView(): View {
+        val rootView = findViewById<ViewGroup>(android.R.id.content)
+        val loadingView = layoutInflater.inflate(R.layout.tlib_ad_loading_dialog, rootView, false)
 
-        dialogBinding.textView21.setTextColor(dialogTextColor)
-        dialogBinding.progressBar.indeterminateTintList = ColorStateList.valueOf(dialogTextColor)
-        dialogBinding.mainLayout.setBackgroundColor(dialogBackgroundColor)
+        loadingView.findViewById<TextView>(R.id.textView21).setTextColor(dialogTextColor)
+        loadingView.findViewById<ProgressBar>(R.id.progressBar).indeterminateTintList =
+            ColorStateList.valueOf(dialogTextColor)
+        loadingView.findViewById<MaterialCardView>(R.id.dialogBg)
+            .setCardBackgroundColor(dialogBackgroundColor)
 
-        dialog.setOnKeyListener { _, keyCode, event ->
-            if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
-                return@setOnKeyListener true
-            }
-            false
+        rootView.addView(loadingView)
+        return loadingView
+    }
+
+    fun Activity.hideAdLoadingView(loadingView: View?) {
+        if (!isFinishing && !isDestroyed) {
+            val rootView = findViewById<ViewGroup>(android.R.id.content)
+            loadingView?.let { rootView.removeView(it) }
         }
-        if (!dialog.isShowing)
-            dialog.show()
-        return dialog
     }
 }

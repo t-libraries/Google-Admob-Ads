@@ -2,16 +2,14 @@ package com.admobads.ads
 
 import android.app.Activity
 import android.app.Application
-import android.app.Dialog
-import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
-import android.view.Window
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -22,6 +20,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.appopen.AppOpenAd
+import com.google.android.material.card.MaterialCardView
 
 class AdmobAppOpenAd(
     private val applicationContext: Application,
@@ -33,7 +32,6 @@ class AdmobAppOpenAd(
     private var currentActivity: Activity? = null
     private var TAG = "+openapp"
     private var isLoadingAd = false
-    private var waiting_dialog: Dialog? = null
     private var isColdStart = true
 
 
@@ -62,18 +60,15 @@ class AdmobAppOpenAd(
     fun loadAd() {
 
         if (isLoadingAd || isAppOpenAdAvailable() || isShowingAd) {
-            dismissWaitingDialog()
             return
         }
 
         if (isPurchased) {
-            dismissWaitingDialog()
             return
         }
 
-        currentActivity?.let {
-            showWaitingDialog(it)
-        }
+
+        val loadingView = currentActivity?.showAdLoadingView()
 
         isLoadingAd = true
 
@@ -82,7 +77,7 @@ class AdmobAppOpenAd(
                 this@AdmobAppOpenAd.appOpenAd = appOpenAd
                 Log.d(LOG_TAG, "App Open Ad Loaded")
                 isLoadingAd = false
-                dismissWaitingDialog()
+                currentActivity?.hideAdLoadingView(loadingView)
                 showAdIfAvailable()
             }
 
@@ -90,7 +85,7 @@ class AdmobAppOpenAd(
                 Log.e("error", loadAdError.message)
                 isLoadingAd = false
                 Log.d(LOG_TAG, "App Open Ad Failed")
-                dismissWaitingDialog()
+                currentActivity?.hideAdLoadingView(loadingView)
             }
         }
 
@@ -129,17 +124,10 @@ class AdmobAppOpenAd(
             return
         }
 
-
-        if (!isAppOpenAdAvailable()) {
-            dismissWaitingDialog()
-            return
-        }
-
         Log.d(LOG_TAG, "Will show ad.")
         appOpenAd!!.fullScreenContentCallback = object : FullScreenContentCallback() {
             /** Called when full screen content is dismissed. */
             override fun onAdDismissedFullScreenContent() {
-                // Set the reference to null so isAdAvailable() returns false.
                 appOpenAd = null
                 isShowingAd = false
 
@@ -156,7 +144,6 @@ class AdmobAppOpenAd(
             override fun onAdShowedFullScreenContent() {
                 Log.d(LOG_TAG, "onAdShowedFullScreenContent.")
             }
-
         }
         isShowingAd = true
         currentActivity?.let { appOpenAd!!.show(it) }
@@ -226,31 +213,39 @@ class AdmobAppOpenAd(
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     }
 
-    private fun showWaitingDialog(context: Context) {
+
+    fun Activity.showAdLoadingView(): View? {
+
         try {
-            waiting_dialog = Dialog(context)
-            waiting_dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-            waiting_dialog?.setCancelable(false)
-            waiting_dialog?.setContentView(R.layout.tlib_ad_loading_dialog)
-            waiting_dialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
-            waiting_dialog?.findViewById<TextView>(R.id.textView21)?.text =
-                context.getString(R.string.tlib_loading)
+            val rootView = findViewById<ViewGroup>(android.R.id.content)
+            val loadingView =
+                layoutInflater.inflate(R.layout.tlib_ad_loading_dialog, rootView, false)
 
-            waiting_dialog?.findViewById<TextView>(R.id.textView21)?.setTextColor(dialogTextColor)
-            waiting_dialog?.findViewById<ProgressBar>(R.id.progressBar)?.indeterminateTintList =
+            loadingView.findViewById<TextView>(R.id.textView21)?.text =
+                getString(R.string.tlib_loading)
+            loadingView.findViewById<TextView>(R.id.textView21).setTextColor(dialogTextColor)
+            loadingView.findViewById<ProgressBar>(R.id.progressBar).indeterminateTintList =
                 ColorStateList.valueOf(dialogTextColor)
-            waiting_dialog?.findViewById<ConstraintLayout>(R.id.mainLayout)
-                ?.setBackgroundColor(dialogBackgroundColor)
+            loadingView.findViewById<MaterialCardView>(R.id.dialogBg)
+                .setCardBackgroundColor(dialogBackgroundColor)
 
-            waiting_dialog?.show()
+            rootView.addView(loadingView)
+            return loadingView
         } catch (e: Exception) {
             e.printStackTrace()
+            return null
         }
-
     }
 
-    private fun dismissWaitingDialog() {
-        waiting_dialog?.dismiss()
+    fun Activity.hideAdLoadingView(loadingView: View?) {
+        if (!isFinishing && !isDestroyed) {
+            try {
+                val rootView = findViewById<ViewGroup>(android.R.id.content)
+                loadingView?.let { rootView.removeView(it) }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
 
