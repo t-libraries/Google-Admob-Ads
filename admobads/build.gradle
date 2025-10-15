@@ -1,9 +1,9 @@
 plugins {
-    alias(libs.plugins.android.library)
+
     alias(libs.plugins.kotlin.android)
     id("maven-publish")
 }
-
+apply plugin: 'com.android.library'
 android {
     namespace 'com.admobads.ads'
     compileSdk 36
@@ -109,19 +109,18 @@ afterEvaluate {
 dependencies {
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation libs.androidx.appcompat.v171
+    implementation ("androidx.appcompat:appcompat:1.7.1")
     testImplementation libs.junit
     implementation libs.material
-    androidTestImplementation libs.androidx.runner.v140
-    androidTestImplementation libs.androidx.espresso.core.v361
-    implementation libs.play.services.ads.v2300
-    implementation libs.androidx.constraintlayout.v221
-    implementation libs.sdp.android.v110
+    androidTestImplementation ("androidx.test:runner:1.7.0")
+    androidTestImplementation ("androidx.test.espresso:espresso-core:3.6.1")
+    implementation ("com.google.android.gms:play-services-ads:23.6.0")
+    implementation ("androidx.constraintlayout:constraintlayout:2.2.1")
+    implementation ("com.intuit.sdp:sdp-android:1.1.1")
 
-    //lifecycle
-    implementation libs.androidx.lifecycle.runtime.ktx
-    implementation libs.androidx.lifecycle.process
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0")
+    implementation ("androidx.lifecycle:lifecycle-process:2.6.0")
 
-    implementation libs.gson
+    implementation ("com.google.code.gson:gson:2.10.1")
 
 }
