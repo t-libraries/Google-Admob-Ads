@@ -55,6 +55,7 @@ class AdmobAdManger(
         modelItem?.apply {
             if (id != "") {
                 if (ad_format == "banner") {
+                    adContainer.radius = 0f
                     AdmobBannerAd(context, adLayout)
                         .setSkeletonColor(skeletonColor)
                         .loadBannerAd(id, ad_type, position)
