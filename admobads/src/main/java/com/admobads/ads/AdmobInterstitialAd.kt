@@ -1,5 +1,6 @@
 package com.admobads.ads
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -12,7 +13,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.graphics.toColorInt
+import com.admobads.ads.utils.AdLoadingComposable
 import com.admobads.ads.utils.isNetworkAvailable
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
@@ -21,7 +25,9 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.card.MaterialCardView
+import androidx.core.view.isEmpty
 
+@SuppressLint("StaticFieldLeak")
 object AdmobInterstitialAd {
     private var splashInterstitialAd: InterstitialAd? = null
 
@@ -30,6 +36,8 @@ object AdmobInterstitialAd {
     private var mInterstitialAd: InterstitialAd? = null
     private var isPreviousAdLoading = false
     private var isPurchased = false
+    private var isComposed = false
+    private var currentComposeLoadingView: View? = null
     private var inter_counter_start = 2
     private var inter_counter_start_inside = 2
     private var inter_counter_gap = 3
@@ -44,6 +52,11 @@ object AdmobInterstitialAd {
 
     fun setPurchased(isPurchased: Boolean = false) {
         this.isPurchased = isPurchased
+    }
+
+
+    fun setComposed(isPurchased: Boolean = false) {
+        this.isComposed = isPurchased
     }
 
 
@@ -336,23 +349,57 @@ object AdmobInterstitialAd {
     }
 
     fun Activity.showAdLoadingView(): View {
-        val rootView = findViewById<ViewGroup>(android.R.id.content)
-        val loadingView = layoutInflater.inflate(R.layout.tlib_ad_loading_dialog, rootView, false)
+        if (isComposed) {
+            val composeView = ComposeView(this).apply {
+                setContent {
+                    AdLoadingComposable(
+                        backgroundColor = androidx.compose.ui.graphics.Color(dialogBackgroundColor),
+                        textColor = androidx.compose.ui.graphics.Color(dialogTextColor),
+                        progressColor = androidx.compose.ui.graphics.Color(dialogTextColor)
+                    )
+                }
+            }
 
-        loadingView.findViewById<TextView>(R.id.textView21).setTextColor(dialogTextColor)
-        loadingView.findViewById<ProgressBar>(R.id.progressBar).indeterminateTintList =
-            ColorStateList.valueOf(dialogTextColor)
-        loadingView.findViewById<MaterialCardView>(R.id.dialogBg)
-            .setCardBackgroundColor(dialogBackgroundColor)
+            val rootView = findViewById<ViewGroup>(android.R.id.content)
+            rootView.addView(composeView)
 
-        rootView.addView(loadingView)
-        return loadingView
+            currentComposeLoadingView = composeView
+            return composeView
+        } else {
+            val rootView = findViewById<ViewGroup>(android.R.id.content)
+            val loadingView = layoutInflater.inflate(R.layout.tlib_ad_loading_dialog, rootView, false)
+
+            loadingView.findViewById<TextView>(R.id.textView21).setTextColor(dialogTextColor)
+            loadingView.findViewById<ProgressBar>(R.id.progressBar).indeterminateTintList =
+                ColorStateList.valueOf(dialogTextColor)
+            loadingView.findViewById<MaterialCardView>(R.id.dialogBg)
+                .setCardBackgroundColor(dialogBackgroundColor)
+
+            rootView.addView(loadingView)
+            return loadingView
+        }
     }
 
     fun Activity.hideAdLoadingView(loadingView: View?) {
-        if (!isFinishing && !isDestroyed) {
-            val rootView = findViewById<ViewGroup>(android.R.id.content)
-            loadingView?.let { rootView.removeView(it) }
+        try {
+            if (!isFinishing && !isDestroyed) {
+                val rootView = findViewById<ViewGroup>(android.R.id.content)
+                loadingView?.let { view ->
+                    if (view.parent != null) {
+                        rootView.removeView(view)
+                    }
+
+                    if (view is ComposeView) {
+                        view.disposeComposition()
+                    }
+                }
+
+                if (isComposed) {
+                    currentComposeLoadingView = null
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error hiding loading view: ${e.message}")
         }
     }
 }

@@ -20,11 +20,18 @@ class AdmobAdManger(
 
     companion object {
         private var isPurchased = false
+        private var isComposed = false
 
         fun isPurchased(value: Boolean = false) {
             isPurchased = value
             AdmobInterstitialAd.setPurchased(value)
             AdmobAppOpenAd.setPurchased(value)
+        }
+
+        fun isComposed(value: Boolean = false) {
+            isComposed = value
+            AdmobInterstitialAd.setComposed(value)
+            AdmobAppOpenAd.setComposed(value)
         }
     }
 

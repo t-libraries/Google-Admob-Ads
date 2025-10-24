@@ -10,10 +10,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import com.admobads.ads.utils.AdLoadingComposable
 import com.admobads.ads.utils.isNetworkAvailable
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
@@ -33,6 +35,7 @@ class AdmobAppOpenAd(
     private var TAG = "+openapp"
     private var isLoadingAd = false
     private var isColdStart = true
+    private var currentComposeLoadingView: View? = null
 
 
     override fun onStart(owner: LifecycleOwner) {
@@ -184,12 +187,17 @@ class AdmobAppOpenAd(
         private const val LOG_TAG = "AppOpenManager"
         private var isShowingAd = false
         private var isPurchased = false
+        private var isComposed = false
         private var shouldshowAppOpen = true
 
         private var dialogTextColor = Color.BLACK
         private var dialogBackgroundColor = "#F8F8F8".toColorInt()
         fun setPurchased(isPurchase: Boolean = false) {
             isPurchased = isPurchase
+        }
+
+        fun setComposed(isCompose: Boolean = false) {
+            isComposed = isCompose
         }
 
         fun shouldshowAppOpen(isInterstitialShowing: Boolean = true) {
@@ -214,15 +222,27 @@ class AdmobAppOpenAd(
     }
 
 
-    fun Activity.showAdLoadingView(): View? {
+    fun Activity.showAdLoadingView(): View {
+        if (isComposed) {
+            val composeView = ComposeView(this).apply {
+                setContent {
+                    AdLoadingComposable(
+                        backgroundColor = androidx.compose.ui.graphics.Color(dialogBackgroundColor),
+                        textColor = androidx.compose.ui.graphics.Color(dialogTextColor),
+                        progressColor = androidx.compose.ui.graphics.Color(dialogTextColor)
+                    )
+                }
+            }
 
-        try {
             val rootView = findViewById<ViewGroup>(android.R.id.content)
-            val loadingView =
-                layoutInflater.inflate(R.layout.tlib_ad_loading_dialog, rootView, false)
+            rootView.addView(composeView)
 
-            loadingView.findViewById<TextView>(R.id.textView21)?.text =
-                getString(R.string.tlib_loading)
+            currentComposeLoadingView = composeView
+            return composeView
+        } else {
+            val rootView = findViewById<ViewGroup>(android.R.id.content)
+            val loadingView = layoutInflater.inflate(R.layout.tlib_ad_loading_dialog, rootView, false)
+
             loadingView.findViewById<TextView>(R.id.textView21).setTextColor(dialogTextColor)
             loadingView.findViewById<ProgressBar>(R.id.progressBar).indeterminateTintList =
                 ColorStateList.valueOf(dialogTextColor)
@@ -231,20 +251,29 @@ class AdmobAppOpenAd(
 
             rootView.addView(loadingView)
             return loadingView
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return null
         }
     }
 
     fun Activity.hideAdLoadingView(loadingView: View?) {
-        if (!isFinishing && !isDestroyed) {
-            try {
+        try {
+            if (!isFinishing && !isDestroyed) {
                 val rootView = findViewById<ViewGroup>(android.R.id.content)
-                loadingView?.let { rootView.removeView(it) }
-            } catch (e: Exception) {
-                e.printStackTrace()
+                loadingView?.let { view ->
+                    if (view.parent != null) {
+                        rootView.removeView(view)
+                    }
+
+                    if (view is ComposeView) {
+                        view.disposeComposition()
+                    }
+                }
+
+                if (isComposed) {
+                    currentComposeLoadingView = null
+                }
             }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error hiding loading view: ${e.message}")
         }
     }
 

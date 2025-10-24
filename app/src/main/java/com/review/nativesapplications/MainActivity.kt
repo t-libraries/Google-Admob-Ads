@@ -35,8 +35,8 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        AdmobInterstitialAd.setLoadingDialogTextColor(Color.WHITE)
-        AdmobInterstitialAd.setLoadingDialogBgColor("#000000".toColorInt())
+        AdmobInterstitialAd.setLoadingDialogTextColor(Color.BLACK)
+        AdmobInterstitialAd.setLoadingDialogBgColor("#ffffff".toColorInt())
 
         MobileAds.initialize(this)
 
