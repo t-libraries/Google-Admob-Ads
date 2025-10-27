@@ -35,6 +35,8 @@ class AdmobAppOpenAd(
     private var TAG = "+openapp"
     private var isLoadingAd = false
     private var isColdStart = true
+
+    var loadingView: View? = null
     private var currentComposeLoadingView: View? = null
 
 
@@ -71,7 +73,7 @@ class AdmobAppOpenAd(
         }
 
 
-        val loadingView = currentActivity?.showAdLoadingView()
+        loadingView = currentActivity?.showAdLoadingView()
 
         isLoadingAd = true
 
@@ -180,7 +182,15 @@ class AdmobAppOpenAd(
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
     override fun onActivityDestroyed(activity: Activity) {
+
+        try {
+            currentActivity?.hideAdLoadingView(loadingView)
+        } catch (e: Exception){
+            e.printStackTrace()
+        }
+
         currentActivity = null
+
     }
 
     companion object {
@@ -241,7 +251,8 @@ class AdmobAppOpenAd(
             return composeView
         } else {
             val rootView = findViewById<ViewGroup>(android.R.id.content)
-            val loadingView = layoutInflater.inflate(R.layout.tlib_ad_loading_dialog, rootView, false)
+            val loadingView =
+                layoutInflater.inflate(R.layout.tlib_ad_loading_dialog, rootView, false)
 
             loadingView.findViewById<TextView>(R.id.textView21).setTextColor(dialogTextColor)
             loadingView.findViewById<ProgressBar>(R.id.progressBar).indeterminateTintList =
