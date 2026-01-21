@@ -1,0 +1,150 @@
+plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    id("maven-publish")
+    id("org.jetbrains.kotlin.plugin.compose")
+}
+
+android {
+    namespace 'com.admobads.ads'
+    compileSdk 36
+
+    defaultConfig {
+        minSdk 21
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = '11'
+    }
+
+    lint {
+        baseline = file("lint-baseline.xml")
+        resourcePrefix 'tlib_'
+    }
+
+    buildFeatures {
+        viewBinding true
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.8"
+    }
+}
+
+ext {
+    PUBLISH_GROUP_ID = "com.github.ads"
+    PUBLISH_VERSION = "v1.1.4"
+    PUBLISH_ARTIFACT_ID = "admobads"
+    PUBLISH_DESCRIPTION = "An android gradle plugin for admob ads"
+    PUBLISH_URL = "https://github.com/t-libraries/Google-Admob-Ads"
+    PUBLISH_LICENSE_NAME = "Apache 2.0 License"
+    PUBLISH_LICENSE_URL = "https://www.apache.org/licenses/LICENSE-2.0"
+    PUBLISH_DEVELOPER_ID = "t-libraries"
+    PUBLISH_DEVELOPER_NAME = "t-libraries"
+    PUBLISH_DEVELOPER_EMAIL = "mailto:developerresource@technest.pk"
+    PUBLISH_SCM_CONNECTION = "scm:git:ssh://github.com/t-libraries/Google-Admob-Ads.git"
+    PUBLISH_SCM_DEVELOPER_CONNECTION = "scm:git:ssh://github.com/t-libraries/Google-Admob-Ads.git"
+    PUBLISH_SCM_URL = "https://github.com/t-libraries/Google-Admob-Ads"
+}
+
+// Set version and group using `ext` properties
+version = project.ext.PUBLISH_VERSION
+group = project.ext.PUBLISH_GROUP_ID
+
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            create("release", MavenPublication) {
+                // Applies the component for the release build variant.
+                from components["release"]
+
+                // Use the properties from the `ext` block
+                groupId = project.ext.PUBLISH_GROUP_ID
+                artifactId = project.ext.PUBLISH_ARTIFACT_ID
+                version = project.ext.PUBLISH_VERSION
+
+                // Add additional metadata to the POM
+                pom {
+                    name.set(project.ext.PUBLISH_ARTIFACT_ID)
+                    description.set(project.ext.PUBLISH_DESCRIPTION)
+                    url.set(project.ext.PUBLISH_URL)
+
+                    licenses {
+                        license {
+                            name.set(project.ext.PUBLISH_LICENSE_NAME)
+                            url.set(project.ext.PUBLISH_LICENSE_URL)
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id.set(project.ext.PUBLISH_DEVELOPER_ID)
+                            name.set(project.ext.PUBLISH_DEVELOPER_NAME)
+                            email.set(project.ext.PUBLISH_DEVELOPER_EMAIL)
+                        }
+                    }
+
+                    scm {
+                        connection.set(project.ext.PUBLISH_SCM_CONNECTION)
+                        developerConnection.set(project.ext.PUBLISH_SCM_DEVELOPER_CONNECTION)
+                        url.set(project.ext.PUBLISH_SCM_URL)
+                    }
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation libs.androidx.appcompat.v171
+    testImplementation libs.junit
+    implementation libs.material
+    androidTestImplementation libs.androidx.runner.v140
+    androidTestImplementation libs.androidx.espresso.core.v361
+    implementation libs.play.services.ads.v2300
+    implementation libs.androidx.constraintlayout.v221
+    implementation libs.sdp.android.v110
+
+    //lifecycle
+    implementation libs.androidx.lifecycle.runtime.ktx
+    implementation libs.androidx.lifecycle.process
+
+    implementation libs.gson
+
+
+    // Core Compose dependencies
+    implementation("androidx.compose.ui:ui:1.9.4")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.9.4")
+    implementation("androidx.compose.foundation:foundation:1.9.4")
+
+    // Material 3 for Compose
+    implementation("androidx.compose.material3:material3:1.4.0")
+
+    // Activity Compose
+    implementation("androidx.activity:activity-compose:1.11.0")
+
+    // Runtime for remember
+    implementation("androidx.compose.runtime:runtime:1.9.4")
+    implementation("androidx.compose.runtime:runtime-livedata:1.9.4")
+
+
+}

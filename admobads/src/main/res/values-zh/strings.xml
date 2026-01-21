@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tlib_app_name" translatable="false">NativeAdLoader</string>
+    <string name="tlib_loading" translatable="false">正在加载</string>
+    <string name="tlib_loading_ad" translatable="false">正在加载广告</string>
+</resources>

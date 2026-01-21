@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SkeletonView">
+        <attr name="autoStart" format="boolean"/>
+        <attr name="enableDevelopPreview" format="boolean"/>
+        <attr name="splitSkeletonTextByLines" format="boolean"/>
+        <attr name="clipToText" format="boolean"/>
+        <attr name="skeletonColor" format="color"/>
+        <attr name="shimmerStrokeWidth" format="dimension"/>
+        <attr name="shimmerBlurWidth" format="dimension"/>
+        <attr name="shimmerLightenFactor" format="float"/>
+        <attr name="skeletonCornerRadius" format="dimension"/>
+        <attr name="skeletonViewHolderItem" format="reference"/>
+        <attr name="skeletonViewHolderAmount" format="integer"/>
+        <attr name="skeletonViewHolderTruncate" format="boolean"/>
+        <attr name="customDuration" format="integer"/>
+        <attr name="skeletonAnimationDuration" format="enum">
+            <enum name="shortCycle" value="0"/>
+            <enum name="mediumCycle" value="1"/>
+            <enum name="longCycle" value="2"/>
+        </attr>
+    </declare-styleable>
+    <attr name="SkeletonView" format="reference"/>
+</resources>

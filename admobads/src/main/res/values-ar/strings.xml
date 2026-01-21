@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tlib_app_name" translatable="false">مُحمّل الإعلانات الأصلية</string>
+    <string name="tlib_loading" translatable="false">جارٍ التحميل</string>
+    <string name="tlib_loading_ad" translatable="false">جارٍ تحميل الإعلان</string>
+</resources>

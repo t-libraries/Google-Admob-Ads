@@ -1,0 +1,19 @@
+<resources>
+
+    <style name="tlib_DefaultSkeletonView">
+        <item name="autoStart">true</item>
+        <item name="skeletonAnimationDuration">mediumCycle</item>
+        <item name="customDuration">-1</item>
+        <item name="enableDevelopPreview">true</item>
+        <item name="skeletonColor">@color/tlib_defaultSkeletonColor</item>
+        <item name="shimmerStrokeWidth">@dimen/tlib_defaultSkeletonStrokeWidth</item>
+        <item name="shimmerBlurWidth">@dimen/tlib_defaultSkeletonBlurWidth</item>
+        <item name="shimmerLightenFactor">0.2</item>
+        <item name="skeletonCornerRadius">@dimen/tlib_defaultSkeletonCornerRadius</item>
+        <item name="splitSkeletonTextByLines">true</item>
+        <item name="clipToText">true</item>
+        <item name="skeletonViewHolderAmount">-1</item>
+        <item name="skeletonViewHolderTruncate">false</item>
+    </style>
+
+</resources>

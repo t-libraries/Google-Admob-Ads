@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="tlib_default_margin">10dp</dimen>
+    <dimen name="tlib_text_size_small">11sp</dimen>
+    <dimen name="tlib_text_size_large">15sp</dimen>
+    <dimen name="tlib_no_margin">0dp</dimen>
+    <dimen name="tlib_no_size">0dp</dimen>
+    <dimen name="tlib_defaultSkeletonCornerRadius">5dp</dimen>
+    <dimen name="tlib_defaultSkeletonStrokeWidth">30dp</dimen>
+    <dimen name="tlib_defaultSkeletonBlurWidth">25dp</dimen>
+</resources>
