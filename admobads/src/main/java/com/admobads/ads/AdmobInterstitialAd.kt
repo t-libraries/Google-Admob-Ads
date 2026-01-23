@@ -354,6 +354,7 @@ object AdmobInterstitialAd {
     }
 
     fun Activity.showInterAd(callBack: () -> Unit) {
+
         if (isPurchased) {
             callBack.invoke()
             return
@@ -657,17 +658,25 @@ object AdmobInterstitialAd {
     }
 
     private fun blockTouches(activity: Activity) {
-        blockedActivity = activity
-        activity.window.setFlags(
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-        )
+        try {
+            blockedActivity = activity
+            activity.window.setFlags(
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
 
     private fun unblockTouches() {
-        blockedActivity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-        blockedActivity = null
+        try {
+            blockedActivity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+            blockedActivity = null
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
 }
