@@ -9,7 +9,7 @@
 
     <activity
         android:name="com.google.android.gms.ads.AdActivity"
-        android:theme="@style/AdTheme"
+        android:theme="@style/tlib_AdTheme"
         tools:replace="android:theme"
         android:screenOrientation="portrait"/>
 

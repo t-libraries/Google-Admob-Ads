@@ -10,7 +10,7 @@
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
     </style>
 
-    <style name="AdTheme" >
+    <style name="tlib_AdTheme" >
         <item name="android:background">@color/tlib_black</item>
         <item name="android:windowBackground">@color/tlib_black</item>
         <item name="android:windowExitAnimation">@null</item>

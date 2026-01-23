@@ -9,5 +9,6 @@
     <color name="tlib_blue">#38AE77</color>
     <color name="tlib_defaultSkeletonColor">#E6E6E6</color>
     <color name="tlib_gray">#808080</color>
-    <color name="tlib_dialog_bg">#E7FFFFFF</color>
+    <color name="tlib_dialog_bg">#EE000000</color>
+"
 </resources>
