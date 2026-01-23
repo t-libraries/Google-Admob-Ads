@@ -1,5 +1,8 @@
 package com.admobads.data
 
+import androidx.annotation.Keep
+
+@Keep
 data class InterAdModel(
     val inter_type: String = "timer",
     val inter_counter_start: Int = 0,
