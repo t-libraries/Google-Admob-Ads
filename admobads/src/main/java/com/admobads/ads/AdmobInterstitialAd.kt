@@ -263,14 +263,14 @@ object AdmobInterstitialAd {
         }
     }
 
-    fun Activity.showSplashInterAd(callBack: () -> Unit) {
+    fun Activity.showSplashInterAd(callBack: (Boolean) -> Unit) {
         if (isPurchased) {
-            callBack.invoke()
+            callBack.invoke(true)
             return
         }
 
         if (splashInterstitialAd == null) {
-            callBack.invoke()
+            callBack.invoke(false)
             return
         }
 
@@ -282,7 +282,7 @@ object AdmobInterstitialAd {
                     super.onAdDismissedFullScreenContent()
                     splashInterstitialAd = null
                     AdmobAppOpenAd.shouldshowAppOpen()
-                    callBack.invoke()
+                    callBack.invoke(true)
                     unblockTouches()
                 }
 
@@ -293,7 +293,7 @@ object AdmobInterstitialAd {
 
                 override fun onAdFailedToShowFullScreenContent(p0: AdError) {
                     super.onAdFailedToShowFullScreenContent(p0)
-                    callBack.invoke()
+                    callBack.invoke(false)
                     AdmobAppOpenAd.shouldshowAppOpen()
                     unblockTouches()
                 }

@@ -62,8 +62,8 @@ class MainActivity : AppCompatActivity() {
             .setMargintoNative(10, 10)
             .loadAd(
                 RemoteModel(
-                    "/21775744923/example/native-video",
-                    "native",
+                    "ca-app-pub-3940256099942544/9214589741",
+                    "banner",
                     2,
                     false,
                     "#FFC0CB"
