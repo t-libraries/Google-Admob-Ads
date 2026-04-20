@@ -2,6 +2,7 @@ package com.review.nativesapplications
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -17,6 +18,7 @@ class BannerAdActivity : AppCompatActivity() {
         ActivityBannerAdBinding.inflate(layoutInflater)
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -29,8 +31,13 @@ class BannerAdActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        showInterAd {
-            finish()
-        }
+        showInterAd(
+            message = {
+                Log.d("AdAVailiblityhasit",it)
+            },
+            callBack = {
+                finish()
+            }
+        )
     }
 }

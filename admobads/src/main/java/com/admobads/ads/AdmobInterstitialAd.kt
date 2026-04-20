@@ -16,6 +16,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.graphics.toColorInt
+import com.admobads.ads.AdmobPreloadInterstitialAd.showPreloadInter
 import com.admobads.ads.utils.AdLoadingComposable
 import com.admobads.ads.utils.isNetworkAvailable
 import com.admobads.data.InterAdModel
@@ -54,26 +55,33 @@ object AdmobInterstitialAd {
     private var shouldLoadAd = false
     private var dialogBackgroundColor = "#F8F8F8".toColorInt()
     private var dialogTextColor = Color.BLACK
-
-    private var blockedActivity: Activity? = null
+    var blockedActivity: Activity? = null
+    private var isInterIntialized = false
+    private var loadingtype = "manual"
+    private var backCallback: androidx.activity.OnBackPressedCallback? = null
+    private var adMessage: String = "Ad Loading"
 
 
     fun setPurchased(isPurchased: Boolean = false) {
         this.isPurchased = isPurchased
+        AdmobPreloadInterstitialAd.setPurchased(isPurchased)
     }
 
-    fun setComposed(isPurchased: Boolean = false) {
-        this.isComposed = isPurchased
+    fun setComposed(isComposed: Boolean = false) {
+        this.isComposed = isComposed
+        AdmobPreloadInterstitialAd.setComposed(isComposed)
     }
 
     fun setLoadingDialogBgColor(loadingDialogBgColor: Int) {
         this.dialogBackgroundColor = loadingDialogBgColor
         AdmobAppOpenAd.setDialogBGColor(loadingDialogBgColor)
+        AdmobPreloadInterstitialAd.setLoadingDialogBgColor(loadingDialogBgColor)
     }
 
     fun setLoadingDialogTextColor(loadingDialogTextColor: Int) {
         this.dialogTextColor = loadingDialogTextColor
         AdmobAppOpenAd.setDialogTextColor(loadingDialogTextColor)
+        AdmobPreloadInterstitialAd.setLoadingDialogTextColor(loadingDialogTextColor)
     }
 
     fun initInterFromConfig(
@@ -82,21 +90,41 @@ object AdmobInterstitialAd {
         inside_inter_ad_id: String
     ) {
 
-        if (config.inter_type == "timer") {
-            initTimeBased(
-                context = context,
-                interStartAfterSeconds = config.inter_start_after_seconds,
-                loadFirstBeforeSeconds = config.inter_start_load_before_seconds,
-                gapAfterSeconds = config.inter_gap_after_seconds,
-                loadGapBeforeSeconds = config.inter_gap_load_before_seconds,
-                inside_inter_ad_id = inside_inter_ad_id
-            )
+        if (isInterIntialized) {
+            return
+        }
+
+        isInterIntialized = true
+
+
+        Log.d(TAG, "Inside  ${config?.loading_type}")
+
+        loadingtype = if (config.loading_type == "manual") "manual" else ""
+
+        if (config.loading_type == "manual") {
+
+            if (config.inter_type == "timer") {
+                initTimeBased(
+                    context = context,
+                    interStartAfterSeconds = config.inter_start_after_seconds,
+                    loadFirstBeforeSeconds = config.inter_start_load_before_seconds,
+                    gapAfterSeconds = config.inter_gap_after_seconds,
+                    loadGapBeforeSeconds = config.inter_gap_load_before_seconds,
+                    inside_inter_ad_id = inside_inter_ad_id
+                )
+            } else {
+                initValues(
+                    context = context,
+                    inter_counter_start = config.inter_counter_start,
+                    inter_counter_gap = config.inter_counter_gap,
+                    inside_inter_ad_id = inside_inter_ad_id
+                )
+            }
+
         } else {
-            initValues(
-                context = context,
-                inter_counter_start = config.inter_counter_start,
-                inter_counter_gap = config.inter_counter_gap,
-                inside_inter_ad_id = inside_inter_ad_id
+            AdmobPreloadInterstitialAd.start(
+                config,
+                inside_inter_ad_id
             )
         }
 
@@ -246,12 +274,14 @@ object AdmobInterstitialAd {
 
         val callback = object : InterstitialAdLoadCallback() {
             override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                adMessage = "Splash Ad Loaded"
                 isPreviousAdLoading = false
                 splashInterstitialAd = interstitialAd
                 onAdLoaded.invoke()
             }
 
             override fun onAdFailedToLoad(adError: LoadAdError) {
+                adMessage = "Splash Ad Loading Failed Error: ${adError.message}"
                 isPreviousAdLoading = false
                 onAdFailedToLoad.invoke()
             }
@@ -263,17 +293,23 @@ object AdmobInterstitialAd {
         }
     }
 
-    fun Activity.showSplashInterAd(callBack: (Boolean) -> Unit) {
+    fun Activity.showSplashInterAd(callBack: (Boolean) -> Unit, message: (String) -> Unit = {}) {
+
+
         if (isPurchased) {
+            message.invoke("Premium User")
             callBack.invoke(true)
             return
         }
+
+        message.invoke(adMessage)
 
         if (splashInterstitialAd == null) {
             callBack.invoke(false)
             return
         }
 
+        blockTouches(this)
         val loadingView = showAdLoadingView()
         Handler(Looper.getMainLooper()).postDelayed({
             hideAdLoadingView(loadingView)
@@ -300,7 +336,7 @@ object AdmobInterstitialAd {
             }
 
             splashInterstitialAd?.show(this)
-            blockTouches(this)
+
             AdmobAppOpenAd.shouldshowAppOpen(false)
         }, 1500)
     }
@@ -318,6 +354,14 @@ object AdmobInterstitialAd {
         }
 
         if (!isNetworkAvailable(ctx)) {
+            adMessage = "Internet not available"
+            return
+        }
+
+
+        if (splashInterstitialAd != null) {
+            mInterstitialAd = splashInterstitialAd
+            splashInterstitialAd = null
             return
         }
 
@@ -325,11 +369,6 @@ object AdmobInterstitialAd {
             return
         }
 
-        if (splashInterstitialAd != null) {
-            mInterstitialAd = splashInterstitialAd
-            splashInterstitialAd = null
-            return
-        }
 
 
         Log.d(TAG, "Loaded Requested")
@@ -338,11 +377,13 @@ object AdmobInterstitialAd {
             override fun onAdLoaded(interstitialAd: InterstitialAd) {
                 isPreviousAdLoading = false
                 mInterstitialAd = interstitialAd
+                adMessage = "Inside Ad Loaded"
                 Log.d(TAG, "AdmobInterstitialAd: onAdLoaded")
             }
 
             override fun onAdFailedToLoad(adError: LoadAdError) {
                 isPreviousAdLoading = false
+                adMessage = "Inside Ad Loading Failed Error : ${adError.message}"
                 Log.d(TAG, "AdmobInterstitialAd: onAdFailedToLoad")
             }
         }
@@ -353,20 +394,44 @@ object AdmobInterstitialAd {
         }
     }
 
-    fun Activity.showInterAd(callBack: () -> Unit) {
+    fun Activity.showInterAd(
+        message: (String) -> Unit = {},
+        callBack: () -> Unit
+    ) {
 
         if (isPurchased) {
+            message.invoke("Premium User")
             callBack.invoke()
             return
         }
 
+        if (loadingtype == "") {
+            showPreloadInter(
+                message = {
+                    message.invoke(it)
+                },
+                callBack = {
+                    callBack.invoke()
+                }
+            )
+            return
+        }
+
         if (inter_type == "timer") {
-            showTimeBasedInter(callBack)
+            showTimeBasedInter(
+                message = {
+                    message.invoke(it)
+                },
+                callBack = {
+                    callBack.invoke()
+                })
             return
         }
 
 
         Log.d(TAG, "Counter == $inter_counter_start")
+
+        message.invoke(adMessage)
 
         if (inter_counter_start != 0 && mInterstitialAd == null) {
             callBack.invoke()
@@ -388,13 +453,15 @@ object AdmobInterstitialAd {
             }
         }
 
-
+        blockTouches(this)
+        AdmobAppOpenAd.shouldshowAppOpen(false)
         val loadingView = showAdLoadingView()
         Handler(Looper.getMainLooper()).postDelayed({
-            hideAdLoadingView(loadingView)
+
             mInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
                 override fun onAdDismissedFullScreenContent() {
                     super.onAdDismissedFullScreenContent()
+                    hideAdLoadingView(loadingView)
                     callBack.invoke()
                     AdmobAppOpenAd.shouldshowAppOpen()
                     if (inter_counter_start != 0 && inter_counter_start <= 2) {
@@ -404,7 +471,9 @@ object AdmobInterstitialAd {
                 }
 
                 override fun onAdShowedFullScreenContent() {
+
                     super.onAdShowedFullScreenContent()
+
                     mInterstitialAd = null
                     inter_counter_start = inter_counter_gap
                 }
@@ -418,86 +487,10 @@ object AdmobInterstitialAd {
                 }
             }
 
-            blockTouches(this)
             mInterstitialAd?.show(this)
-            AdmobAppOpenAd.shouldshowAppOpen(false)
         }, 1500)
     }
 
-    fun Activity.showInterAd(intent: Intent? = null, finish: Boolean = false) {
-
-        if (isPurchased) {
-            intent?.let { startActivity(intent) }
-            if (finish) finish()
-            return
-        }
-
-        if (inter_type == "timer") {
-            showTimeBasedInter(intent, finish)
-            return
-        }
-
-
-        Log.d("intercounterstart", "$inter_counter_start")
-
-        if (inter_counter_start != 0 && mInterstitialAd == null) {
-            inter_counter_start -= 1
-            if (inter_counter_start <= 2) {
-                load(this, inside_inter_ad_id)
-            }
-            intent?.let { startActivity(intent) }
-            if (finish) finish()
-            return
-        } else if (inter_counter_start == 0) {
-            intent?.let { startActivity(intent) }
-            if (finish) finish()
-            return
-        } else {
-            inter_counter_start -= 1
-            if (inter_counter_start > 0) {
-                intent?.let { startActivity(intent) }
-                if (finish) finish()
-                return
-            }
-        }
-
-
-        val loadingView = showAdLoadingView()
-        Handler(Looper.getMainLooper()).postDelayed({
-            hideAdLoadingView(loadingView)
-            mInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
-                override fun onAdDismissedFullScreenContent() {
-                    super.onAdDismissedFullScreenContent()
-                    intent?.let { startActivity(intent) }
-                    if (finish) finish()
-                    AdmobAppOpenAd.shouldshowAppOpen()
-                    if (inter_counter_start != 0 && inter_counter_start <= 2) {
-                        load(this@showInterAd, inside_inter_ad_id)
-                    }
-                    unblockTouches()
-
-                }
-
-                override fun onAdShowedFullScreenContent() {
-                    super.onAdShowedFullScreenContent()
-                    mInterstitialAd = null
-                    inter_counter_start = inter_counter_gap
-                }
-
-                override fun onAdFailedToShowFullScreenContent(p0: AdError) {
-                    super.onAdFailedToShowFullScreenContent(p0)
-                    intent?.let { startActivity(intent) }
-                    if (finish) finish()
-                    AdmobAppOpenAd.shouldshowAppOpen()
-                    unblockTouches()
-                }
-            }
-
-            mInterstitialAd?.show(this)
-            AdmobAppOpenAd.shouldshowAppOpen(false)
-            blockTouches(this)
-        }, 1500)
-    }
 
     private fun Activity.showAdLoadingView(): View {
         if (isComposed) {
@@ -555,18 +548,27 @@ object AdmobInterstitialAd {
         }
     }
 
-    private fun Activity.showTimeBasedInter(callBack: () -> Unit) {
+    private fun Activity.showTimeBasedInter(
+        message: (String) -> Unit = {},
+        callBack: () -> Unit,
+    ) {
 
         if (isPurchased) {
             callBack.invoke()
             return
         }
 
+        message.invoke(adMessage)
+
         if (!isTimeReadyToShow() || mInterstitialAd == null) {
             callBack.invoke()
             return
         }
 
+
+
+        blockTouches(this)
+        AdmobAppOpenAd.shouldshowAppOpen(false)
         val loadingView = showAdLoadingView()
 
         Handler(Looper.getMainLooper()).postDelayed({
@@ -597,14 +599,17 @@ object AdmobInterstitialAd {
                     }
                 }
 
-            blockTouches(this)
             mInterstitialAd?.show(this)
             AdmobAppOpenAd.shouldshowAppOpen(false)
 
         }, 1500)
     }
 
-    private fun Activity.showTimeBasedInter(intent: Intent? = null, finish: Boolean = false) {
+    private fun Activity.showTimeBasedInter(
+        intent: Intent? = null,
+        finish: Boolean = false,
+        message: (String) -> Unit = {}
+    ) {
 
         if (isPurchased) {
             intent?.let { startActivity(intent) }
@@ -618,8 +623,9 @@ object AdmobInterstitialAd {
             return
         }
 
+        blockTouches(this)
+        AdmobAppOpenAd.shouldshowAppOpen(false)
         val loadingView = showAdLoadingView()
-
         Handler(Looper.getMainLooper()).postDelayed({
             hideAdLoadingView(loadingView)
 
@@ -650,7 +656,7 @@ object AdmobInterstitialAd {
                     }
                 }
 
-            blockTouches(this)
+
             mInterstitialAd?.show(this)
             AdmobAppOpenAd.shouldshowAppOpen(false)
 
@@ -660,19 +666,33 @@ object AdmobInterstitialAd {
     private fun blockTouches(activity: Activity) {
         try {
             blockedActivity = activity
+
             activity.window.setFlags(
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
             )
+
+            if (activity is androidx.activity.ComponentActivity) {
+                backCallback = object : androidx.activity.OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        Log.d(TAG, "backpressed")
+                    }
+                }
+                activity.onBackPressedDispatcher.addCallback(activity, backCallback!!)
+            }
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-
     private fun unblockTouches() {
         try {
             blockedActivity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+
+            backCallback?.remove()
+            backCallback = null
+
             blockedActivity = null
         } catch (e: Exception) {
             e.printStackTrace()

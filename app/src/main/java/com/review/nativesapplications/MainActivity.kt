@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColorInt
@@ -27,7 +28,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
- 
+
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -43,14 +44,21 @@ class MainActivity : AppCompatActivity() {
         MyApplication.myApplication?.let {
             AdmobAppOpenAd(
                 it,
-                "ca-app-pub-3940256099942544/9257395921")
+                "ca-app-pub-3940256099942544/9257395921"
+            )
         }
 
 
         binding.continueBtn.setOnClickListener {
-            showInterAd {
-                startActivity(Intent(this , BannerAdActivity :: class.java))
-            }
+            showInterAd(
+
+                message = {
+                    Log.d("AdAVailiblityhasit",it)
+                },
+                callBack = {
+                    startActivity(Intent(this, BannerAdActivity::class.java))
+                }
+            )
         }
 
         AdmobAdManger(

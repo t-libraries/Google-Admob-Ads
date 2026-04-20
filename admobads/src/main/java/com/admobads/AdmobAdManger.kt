@@ -44,6 +44,8 @@ class AdmobAdManger(
     private var nativeAdMarginStart = 0
     private var nativeAdMarginEnd = 0
 
+
+
     fun loadAd(
         modelItem: RemoteModel?, default_ad_format: DefaultAdPlacement = DefaultAdPlacement.BANNER
     ) {

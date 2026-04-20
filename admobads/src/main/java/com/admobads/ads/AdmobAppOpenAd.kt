@@ -5,8 +5,6 @@ import android.app.Application
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -41,6 +39,8 @@ class AdmobAppOpenAd(
     private var blockedActivity: Activity? = null
     var loadingView: View? = null
     private var currentComposeLoadingView: View? = null
+    private var backCallback: androidx.activity.OnBackPressedCallback? = null
+    private var adMessage = ""
 
 
     override fun onStart(owner: LifecycleOwner) {
@@ -79,26 +79,32 @@ class AdmobAppOpenAd(
         }
 
 
+        currentActivity?.let {
+            blockTouches(it)
+        }
         loadingView = currentActivity?.showAdLoadingView()
 
         isLoadingAd = true
 
-        loadCallback = object : AppOpenAd.AppOpenAdLoadCallback() {
-            override fun onAdLoaded(appOpenAd: AppOpenAd) {
-                this@AdmobAppOpenAd.appOpenAd = appOpenAd
-                Log.d(LOG_TAG, "App Open Ad Loaded")
-                isLoadingAd = false
-                currentActivity?.hideAdLoadingView(loadingView)
-                showAdIfAvailable()
-            }
+        loadCallback =
+            object : AppOpenAd.AppOpenAdLoadCallback() {
+                override fun onAdLoaded(appOpenAd: AppOpenAd) {
+                    this@AdmobAppOpenAd.appOpenAd = appOpenAd
+                    Log.d(LOG_TAG, "App Open Ad Loaded")
+                    isLoadingAd = false
+                    adMessage = "App Open Loaded"
+                    currentActivity?.hideAdLoadingView(loadingView)
+                    showAdIfAvailable()
+                }
 
-            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
-                Log.e("error", loadAdError.message)
-                isLoadingAd = false
-                Log.d(LOG_TAG, "App Open Ad Failed")
-                currentActivity?.hideAdLoadingView(loadingView)
+                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                    Log.e("error", loadAdError.message)
+                    isLoadingAd = false
+                    adMessage = "App Open Loading Failed Error : ${loadAdError.message}"
+                    Log.d(LOG_TAG, "App Open Ad Failed")
+                    currentActivity?.hideAdLoadingView(loadingView)
+                }
             }
-        }
 
         try {
             val request = adRequest
@@ -159,7 +165,7 @@ class AdmobAppOpenAd(
         }
         isShowingAd = true
         currentActivity?.let {
-            blockTouches(it)
+
             appOpenAd!!.show(it)
         }
     }
@@ -314,17 +320,39 @@ class AdmobAppOpenAd(
 
 
     private fun blockTouches(activity: Activity) {
-        blockedActivity = activity
-        activity.window.setFlags(
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-        )
+        try {
+            blockedActivity = activity
+
+            activity.window.setFlags(
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            )
+
+            if (activity is androidx.activity.ComponentActivity) {
+                backCallback = object : androidx.activity.OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        Log.d(TAG, "backpressed")
+                    }
+                }
+                activity.onBackPressedDispatcher.addCallback(activity, backCallback!!)
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
-
     private fun unblockTouches() {
-        blockedActivity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-        blockedActivity = null
+        try {
+            blockedActivity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+
+            backCallback?.remove()
+            backCallback = null
+
+            blockedActivity = null
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
 }
