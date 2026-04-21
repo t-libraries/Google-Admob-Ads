@@ -293,7 +293,10 @@ object AdmobInterstitialAd {
         }
     }
 
-    fun Activity.showSplashInterAd(callBack: (Boolean) -> Unit, message: (String) -> Unit = {}) {
+    fun Activity.showSplashInterAd(
+        message: (String) -> Unit = {},
+        callBack: (Boolean) -> Unit
+    ) {
 
 
         if (isPurchased) {

@@ -100,6 +100,7 @@ class AdmobAppOpenAd(
                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
                     Log.e("error", loadAdError.message)
                     isLoadingAd = false
+                    unblockTouches()
                     adMessage = "App Open Loading Failed Error : ${loadAdError.message}"
                     Log.d(LOG_TAG, "App Open Ad Failed")
                     currentActivity?.hideAdLoadingView(loadingView)
