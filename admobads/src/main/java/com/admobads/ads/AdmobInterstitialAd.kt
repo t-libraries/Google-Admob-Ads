@@ -95,7 +95,7 @@ object AdmobInterstitialAd {
     }
 
     private fun resumeAdIfNeeded() {
-        if (pendingActivity != null && mInterstitialAd != null && shouldshowAd) {
+        if (pendingActivity != null && (mInterstitialAd != null || splashInterstitialAd != null) && shouldshowAd) {
             pendingActivity?.let { activity ->
 
                 val loadingView = pendingLoadingView
@@ -372,39 +372,42 @@ object AdmobInterstitialAd {
             return
         }
 
+        val callback = object : FullScreenContentCallback() {
+            override fun onAdDismissedFullScreenContent() {
+                super.onAdDismissedFullScreenContent()
+                splashInterstitialAd = null
+                shouldshowAd = false
+                GlobalState.isInterShowing = false
+                AdmobAppOpenAd.shouldshowAppOpen()
+                callBack.invoke(true)
+                unblockTouches()
+            }
+
+            override fun onAdShowedFullScreenContent() {
+                super.onAdShowedFullScreenContent()
+                splashInterstitialAd = null
+            }
+
+            override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                super.onAdFailedToShowFullScreenContent(p0)
+                callBack.invoke(false)
+                shouldshowAd = false
+                GlobalState.isInterShowing = false
+                AdmobAppOpenAd.shouldshowAppOpen()
+                unblockTouches()
+            }
+        }
+
+        interCallback = callback
+
         GlobalState.isInterShowing = true
         shouldshowAd = true
         blockTouches(this)
         val loadingView = showAdLoadingView()
+        pendingActivity = this
+        pendingLoadingView = loadingView
         adRunnable = Runnable {
             hideAdLoadingView(loadingView)
-            val callback = object : FullScreenContentCallback() {
-                override fun onAdDismissedFullScreenContent() {
-                    super.onAdDismissedFullScreenContent()
-                    splashInterstitialAd = null
-                    shouldshowAd = false
-                    GlobalState.isInterShowing = false
-                    AdmobAppOpenAd.shouldshowAppOpen()
-                    callBack.invoke(true)
-                    unblockTouches()
-                }
-
-                override fun onAdShowedFullScreenContent() {
-                    super.onAdShowedFullScreenContent()
-                    splashInterstitialAd = null
-                }
-
-                override fun onAdFailedToShowFullScreenContent(p0: AdError) {
-                    super.onAdFailedToShowFullScreenContent(p0)
-                    callBack.invoke(false)
-                    shouldshowAd = false
-                    GlobalState.isInterShowing = false
-                    AdmobAppOpenAd.shouldshowAppOpen()
-                    unblockTouches()
-                }
-            }
-
-            interCallback = callback
             splashInterstitialAd?.fullScreenContentCallback = callback
             splashInterstitialAd?.show(this)
             AdmobAppOpenAd.shouldshowAppOpen(false)
