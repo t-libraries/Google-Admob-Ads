@@ -399,7 +399,7 @@ object AdmobInterstitialAd {
         }
 
         interCallback = callback
-
+        AdmobAppOpenAd.shouldshowAppOpen(false)
         GlobalState.isInterShowing = true
         shouldshowAd = true
         blockTouches(this)
@@ -407,10 +407,25 @@ object AdmobInterstitialAd {
         pendingActivity = this
         pendingLoadingView = loadingView
         adRunnable = Runnable {
+            if (
+                !isAppInForeground ||
+                isFinishing ||
+                isDestroyed ||
+                !hasWindowFocus()
+            ) {
+                Log.d(TAG, "Splash ad skipped: invalid state")
+                AdmobAppOpenAd.shouldshowAppOpen(true)
+                hideAdLoadingView(loadingView)
+                shouldshowAd = false
+                callBack.invoke(true)
+                unblockTouches()
+                GlobalState.isInterShowing = false
+                return@Runnable
+            }
             hideAdLoadingView(loadingView)
             splashInterstitialAd?.fullScreenContentCallback = callback
             splashInterstitialAd?.show(this)
-            AdmobAppOpenAd.shouldshowAppOpen(false)
+
         }
         adRunnable?.let { handler.postDelayed(it, 1500) }
     }
@@ -575,6 +590,20 @@ object AdmobInterstitialAd {
         pendingActivity = this
         pendingLoadingView = loadingView
         adRunnable = Runnable {
+            if (!isAppInForeground ||
+                isFinishing ||
+                isDestroyed ||
+                !hasWindowFocus()
+            ) {
+                Log.d(TAG, "Ad skipped: app in background or activity invalid")
+                hideAdLoadingView(loadingView)
+                unblockTouches()
+                callBack.invoke()
+                shouldshowAd = false
+                AdmobAppOpenAd.shouldshowAppOpen(true)
+                GlobalState.isInterShowing = false
+                return@Runnable
+            }
 
             mInterstitialAd?.fullScreenContentCallback = callback
             hideAdLoadingView(loadingView)
@@ -699,6 +728,20 @@ object AdmobInterstitialAd {
         pendingLoadingView = loadingView
 
         adRunnable = Runnable {
+            if (!isAppInForeground ||
+                isFinishing ||
+                isDestroyed ||
+                !hasWindowFocus()
+            ) {
+                Log.d(TAG, "Ad skipped: app in background or activity invalid")
+                hideAdLoadingView(loadingView)
+                unblockTouches()
+                callBack.invoke()
+                shouldshowAd = false
+                AdmobAppOpenAd.shouldshowAppOpen(true)
+                GlobalState.isInterShowing = false
+                return@Runnable
+            }
             hideAdLoadingView(loadingView)
             mInterstitialAd?.fullScreenContentCallback = callback
             mInterstitialAd?.show(this)

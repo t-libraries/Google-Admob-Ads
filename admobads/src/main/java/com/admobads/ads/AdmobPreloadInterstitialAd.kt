@@ -268,7 +268,6 @@ object AdmobPreloadInterstitialAd {
         }
 
         mInterstitialAd = ad
-        currentCounter = interCounterGap
 
         preloadedAdsCount--
         Log.d(TAG, "Ad shown | Remaining preloaded: $preloadedAdsCount")
@@ -276,6 +275,7 @@ object AdmobPreloadInterstitialAd {
         val callback = object : FullScreenContentCallback() {
             override fun onAdShowedFullScreenContent() {
                 Log.d(TAG, "Ad Showed")
+                currentCounter = interCounterGap
                 mInterstitialAd = null
             }
 
@@ -294,7 +294,6 @@ object AdmobPreloadInterstitialAd {
                 GlobalState.isInterShowing = false
                 Log.e(TAG, "Show Failed: ${adError.message}")
                 AdmobAppOpenAd.shouldshowAppOpen()
-                mInterstitialAd = null
                 shouldshowAd = false
                 callBack.invoke()
             }
@@ -317,9 +316,22 @@ object AdmobPreloadInterstitialAd {
         pendingActivity = this
         pendingLoadingView = loadingView
         adRunnable = Runnable {
-            hideAdLoadingView(loadingView)
+            if ( !isAppInForeground ||
+                isFinishing ||
+                isDestroyed ||
+                !hasWindowFocus()) {
+                Log.d(TAG, "Ad skipped: app in background or activity invalid")
+                hideAdLoadingView(loadingView)
+                shouldshowAd = false
+                unblockTouches()
+                AdmobAppOpenAd.shouldshowAppOpen(true)
+                callBack.invoke()
+                GlobalState.isInterShowing = false
+                return@Runnable
+            }
             ad.fullScreenContentCallback = callback
             ad.show(this)
+            hideAdLoadingView(loadingView)
         }
         adRunnable?.let { handler.postDelayed(it, 1500) }
     }
@@ -405,11 +417,27 @@ object AdmobPreloadInterstitialAd {
         pendingActivity = this
         pendingLoadingView = loadingView
         adRunnable = Runnable {
+
+            if ( !isAppInForeground ||
+                isFinishing ||
+                isDestroyed ||
+                !hasWindowFocus()) {
+                Log.d(TAG, "Ad skipped: app in background or activity invalid")
+                hideAdLoadingView(loadingView)
+                shouldshowAd = false
+                unblockTouches()
+                AdmobAppOpenAd.shouldshowAppOpen(true)
+                callBack.invoke()
+                GlobalState.isInterShowing = false
+                return@Runnable
+            }
+
+            ad.fullScreenContentCallback = callback
+            ad.show(this)
             hideAdLoadingView(loadingView)
             lastInterShownTime = System.currentTimeMillis()
             isFirstTimeInterShown = true
-            ad.fullScreenContentCallback = callback
-            ad.show(this)
+
         }
         adRunnable?.let { handler.postDelayed(it, 1500) }
 
