@@ -17,6 +17,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.admobads.ads.utils.AdLoadingComposable
+import com.admobads.ads.utils.GlobalState
 import com.admobads.ads.utils.isNetworkAvailable
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
@@ -33,7 +34,7 @@ class AdmobAppOpenAd(
     private var appOpenAd: AppOpenAd? = null
     private var loadCallback: AppOpenAd.AppOpenAdLoadCallback? = null
     private var currentActivity: Activity? = null
-    private var TAG = "+openapp"
+    private var TAG = "AppOpenManager"
     private var isLoadingAd = false
     private var isColdStart = true
     private var blockedActivity: Activity? = null
@@ -46,7 +47,7 @@ class AdmobAppOpenAd(
     override fun onStart(owner: LifecycleOwner) {
         try {
 
-            Log.d(TAG, "onStart: Coming Inside $isColdStart")
+            Log.d(TAG, "onStart: Coming Inside ${GlobalState.isInterShowing} and ${shouldShowAppOpenAd()}")
 
             if (isColdStart) {
                 isColdStart = false
@@ -55,7 +56,7 @@ class AdmobAppOpenAd(
 
             if (shouldShowAppOpenAd()) {
                 currentActivity?.let {
-                    if (isNetworkAvailable(it)) {
+                    if (isNetworkAvailable(it) && !GlobalState.isInterShowing && shouldshowAppOpen) {
                         loadAd()
                     }
                 }
@@ -79,6 +80,8 @@ class AdmobAppOpenAd(
         }
 
 
+        isShowingAd = true
+
         currentActivity?.let {
             blockTouches(it)
         }
@@ -101,6 +104,7 @@ class AdmobAppOpenAd(
                     Log.e("error", loadAdError.message)
                     isLoadingAd = false
                     unblockTouches()
+                    isShowingAd = false
                     adMessage = "App Open Loading Failed Error : ${loadAdError.message}"
                     Log.d(LOG_TAG, "App Open Ad Failed")
                     currentActivity?.hideAdLoadingView(loadingView)
@@ -140,10 +144,6 @@ class AdmobAppOpenAd(
             return
         }
 
-        if (isShowingAd) {
-            return
-        }
-
         Log.d(LOG_TAG, "Will show ad.")
         appOpenAd!!.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdDismissedFullScreenContent() {
@@ -166,8 +166,7 @@ class AdmobAppOpenAd(
         }
         isShowingAd = true
         currentActivity?.let {
-
-            appOpenAd!!.show(it)
+            appOpenAd?.show(it)
         }
     }
 
@@ -210,7 +209,7 @@ class AdmobAppOpenAd(
 
     companion object {
         private const val LOG_TAG = "AppOpenManager"
-        private var isShowingAd = false
+        var isShowingAd = false
         private var isPurchased = false
         private var isComposed = false
         private var shouldshowAppOpen = true
@@ -313,6 +312,7 @@ class AdmobAppOpenAd(
         return shouldshowAppOpen &&
                 !activityName.contains("splash", ignoreCase = true) &&
                 !activityName.contains("iap", ignoreCase = true) &&
+                !activityName.contains("AdActivity", ignoreCase = true) &&
                 !activityName.contains("premium", ignoreCase = true) &&
                 !activityName.contains("subscription", ignoreCase = true) &&
                 !exceptionalActivities.contains(activityName)

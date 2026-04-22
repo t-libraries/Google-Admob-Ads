@@ -14,11 +14,16 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.graphics.toColorInt
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.admobads.ads.utils.AdLoadingComposable
+import com.admobads.ads.utils.GlobalState
 import com.admobads.data.InterAdModel
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.ResponseInfo
+import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdPreloader
 import com.google.android.gms.ads.preload.PreloadCallbackV2
 import com.google.android.gms.ads.preload.PreloadConfiguration
@@ -46,8 +51,61 @@ object AdmobPreloadInterstitialAd {
     private var dialogTextColor = Color.BLACK
     private var currentComposeLoadingView: View? = null
     private var blockedActivity: Activity? = null
+    private val handler = Handler(Looper.getMainLooper())
+    private var adRunnable: Runnable? = null
+    private var interCallback: FullScreenContentCallback? = null
 
+    private var shouldshowAd = false
+
+    private var isAppInForeground = true
+
+    private var pendingActivity: Activity? = null
+    private var pendingLoadingView: View? = null
     private var adMessage: String = "Ad Loading"
+
+    private var mInterstitialAd: InterstitialAd? = null
+
+
+    init {
+        ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStart(owner: LifecycleOwner) {
+                isAppInForeground = true
+                resumeAdIfNeeded()
+            }
+
+            override fun onStop(owner: LifecycleOwner) {
+                isAppInForeground = false
+                pauseAd()
+            }
+        })
+    }
+
+    private fun pauseAd() {
+        adRunnable?.let {
+            handler.removeCallbacks(it)
+        }
+    }
+
+    private fun resumeAdIfNeeded() {
+        if (pendingActivity != null && mInterstitialAd != null && shouldshowAd) {
+            pendingActivity?.let { activity ->
+
+                val loadingView = pendingLoadingView
+
+                adRunnable = Runnable {
+                    activity.hideAdLoadingView(loadingView)
+                    mInterstitialAd?.show(activity)
+                    mInterstitialAd?.fullScreenContentCallback =
+                        interCallback
+
+                }
+                adRunnable?.let { handler.postDelayed(it, 1000) }
+            }
+
+            pendingActivity = null
+            pendingLoadingView = null
+        }
+    }
 
     fun setPurchased(isPurchased: Boolean = false) {
         this.isPurchased = isPurchased
@@ -209,27 +267,35 @@ object AdmobPreloadInterstitialAd {
             return
         }
 
+        mInterstitialAd = ad
         currentCounter = interCounterGap
 
         preloadedAdsCount--
         Log.d(TAG, "Ad shown | Remaining preloaded: $preloadedAdsCount")
 
-        ad.fullScreenContentCallback = object : FullScreenContentCallback() {
+        val callback = object : FullScreenContentCallback() {
             override fun onAdShowedFullScreenContent() {
                 Log.d(TAG, "Ad Showed")
+                mInterstitialAd = null
             }
 
             override fun onAdDismissedFullScreenContent() {
                 unblockTouches()
+                GlobalState.isInterShowing = false
                 Log.d(TAG, "Ad Dismissed")
+                mInterstitialAd = null
+                shouldshowAd = false
                 AdmobAppOpenAd.shouldshowAppOpen()
                 callBack.invoke()
             }
 
             override fun onAdFailedToShowFullScreenContent(adError: AdError) {
                 unblockTouches()
+                GlobalState.isInterShowing = false
                 Log.e(TAG, "Show Failed: ${adError.message}")
                 AdmobAppOpenAd.shouldshowAppOpen()
+                mInterstitialAd = null
+                shouldshowAd = false
                 callBack.invoke()
             }
 
@@ -242,15 +308,20 @@ object AdmobPreloadInterstitialAd {
             }
         }
 
-
+        interCallback = callback
+        shouldshowAd = true
+        GlobalState.isInterShowing = true
         AdmobAppOpenAd.shouldshowAppOpen(false)
         blockTouches(this)
         val loadingView = showAdLoadingView()
-        Handler(Looper.getMainLooper()).postDelayed({
-
+        pendingActivity = this
+        pendingLoadingView = loadingView
+        adRunnable = Runnable {
             hideAdLoadingView(loadingView)
+            ad.fullScreenContentCallback = callback
             ad.show(this)
-        }, 1500)
+        }
+        adRunnable?.let { handler.postDelayed(it, 1500) }
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -284,14 +355,20 @@ object AdmobPreloadInterstitialAd {
             return
         }
 
-        ad.fullScreenContentCallback = object : FullScreenContentCallback() {
+        mInterstitialAd = ad
+
+        val callback = object : FullScreenContentCallback() {
             override fun onAdShowedFullScreenContent() {
                 Log.d(TAG, "Ad Showed")
+                mInterstitialAd = null
             }
 
             override fun onAdDismissedFullScreenContent() {
                 Log.d(TAG, "Ad Dismissed")
                 unblockTouches()
+                GlobalState.isInterShowing = false
+                shouldshowAd = false
+                mInterstitialAd = null
                 lastInterShownTime = System.currentTimeMillis()
                 AdmobAppOpenAd.shouldshowAppOpen()
                 isFirstTimeInterShown = true
@@ -301,9 +378,12 @@ object AdmobPreloadInterstitialAd {
             override fun onAdFailedToShowFullScreenContent(adError: AdError) {
                 Log.e(TAG, "Show Failed: ${adError.message}")
                 unblockTouches()
+                GlobalState.isInterShowing = false
+                mInterstitialAd = null
                 lastInterShownTime = System.currentTimeMillis()
                 AdmobAppOpenAd.shouldshowAppOpen()
                 isFirstTimeInterShown = true
+                shouldshowAd = false
                 callBack.invoke()
             }
 
@@ -316,16 +396,22 @@ object AdmobPreloadInterstitialAd {
             }
         }
 
+        interCallback = callback
+        shouldshowAd = true
+        GlobalState.isInterShowing = true
         AdmobAppOpenAd.shouldshowAppOpen(false)
         blockTouches(this)
         val loadingView = showAdLoadingView()
-        Handler(Looper.getMainLooper()).postDelayed({
-
+        pendingActivity = this
+        pendingLoadingView = loadingView
+        adRunnable = Runnable {
             hideAdLoadingView(loadingView)
             lastInterShownTime = System.currentTimeMillis()
             isFirstTimeInterShown = true
+            ad.fullScreenContentCallback = callback
             ad.show(this)
-        }, 1500)
+        }
+        adRunnable?.let { handler.postDelayed(it, 1500) }
 
     }
 

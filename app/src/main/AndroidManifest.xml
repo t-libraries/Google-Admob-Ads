@@ -16,7 +16,7 @@
         android:theme="@style/Theme.NativesApplications"
         tools:targetApi="31">
         <activity
-            android:name=".BannerAdActivity"
+            android:name=".BannerActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
