@@ -776,17 +776,18 @@ object AdmobInterstitialAd {
 
     private fun unblockTouches() {
 
-        CoroutineScope(Dispatchers.Main).launch {
+        try {
+            CoroutineScope(Dispatchers.Main).launch {
 
+                blockedActivity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
 
-            Log.d("AdmobInterstitialAd_", "Unblocked Touches")
+                backCallback?.remove()
+                backCallback = null
 
-            blockedActivity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-
-            backCallback?.remove()
-            backCallback = null
-
-            blockedActivity = null
+                blockedActivity = null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

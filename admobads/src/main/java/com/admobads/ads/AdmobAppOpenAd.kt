@@ -47,7 +47,10 @@ class AdmobAppOpenAd(
     override fun onStart(owner: LifecycleOwner) {
         try {
 
-            Log.d(TAG, "onStart: Coming Inside ${GlobalState.isInterShowing} and ${shouldShowAppOpenAd()}")
+            Log.d(
+                TAG,
+                "onStart: Coming Inside ${GlobalState.isInterShowing} and ${shouldShowAppOpenAd()}"
+            )
 
             if (isColdStart) {
                 isColdStart = false
@@ -166,7 +169,13 @@ class AdmobAppOpenAd(
         }
         isShowingAd = true
         currentActivity?.let {
-            appOpenAd?.show(it)
+            if (it.hasWindowFocus()) {
+                appOpenAd?.show(it)
+            } else {
+                appOpenAd = null
+                isShowingAd = false
+                unblockTouches()
+            }
         }
     }
 
