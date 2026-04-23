@@ -122,12 +122,19 @@ object AdmobInterstitialAd {
     private val handler = Handler(Looper.getMainLooper())
     private var adRunnable: Runnable? = null
 
-    fun setPurchased(isPurchased: Boolean = false) {
+    fun setPurchase(isPurchased: Boolean = false){
+        setPurchased(isPurchased)
+    }
+
+    private fun setPurchased(isPurchased: Boolean = false) {
         this.isPurchased = isPurchased
     }
 
     fun isPurchased(): Boolean = isPurchased
 
+    fun setCompose(isComposed: Boolean = false) {
+        setComposed(isComposed)
+    }
     fun setComposed(isComposed: Boolean = false) {
         this.isComposed = isComposed
     }

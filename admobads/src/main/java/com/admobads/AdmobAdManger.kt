@@ -24,13 +24,13 @@ class AdmobAdManger(
 
         fun isPurchased(value: Boolean = false) {
             isPurchased = value
-            AdmobInterstitialAd.setPurchased(value)
+            AdmobInterstitialAd.setPurchase(value)
             AdmobAppOpenAd.setPurchased(value)
         }
 
         fun isComposed(value: Boolean = false) {
             isComposed = value
-            AdmobInterstitialAd.setComposed(value)
+            AdmobInterstitialAd.setCompose(value)
             AdmobAppOpenAd.setComposed(value)
         }
     }
