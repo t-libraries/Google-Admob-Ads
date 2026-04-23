@@ -353,19 +353,16 @@ object AdmobInterstitialAd {
         }
     }
 
-    fun Activity.showSplashAd(
-        message: (String) -> Unit = {},
+    fun Activity.showSplashInterAd(
         callBack: (Boolean) -> Unit
     ) {
 
 
         if (isPurchased) {
-            message.invoke("Premium User")
             callBack.invoke(true)
             return
         }
 
-        message.invoke(adMessage)
 
         if (splashInterstitialAd == null) {
             callBack.invoke(false)
@@ -484,7 +481,6 @@ object AdmobInterstitialAd {
     }
 
     fun Activity.showInterAd(
-        message: (String) -> Unit = {},
         callBack: () -> Unit
     ) {
 
@@ -493,7 +489,6 @@ object AdmobInterstitialAd {
         }
 
         if (isPurchased) {
-            message.invoke("Premium User")
             callBack.invoke()
             return
         }
@@ -501,32 +496,23 @@ object AdmobInterstitialAd {
 
 
         if (loadingtype == "") {
-            showPreloadInter(
-                message = {
-                    message.invoke(it)
-                },
-                callBack = {
-                    callBack.invoke()
-                }
-            )
+            showPreloadInter {
+                callBack.invoke()
+            }
             return
         }
 
         if (inter_type == "timer") {
-            showTimeBasedInter(
-                message = {
-                    message.invoke(it)
-                },
-                callBack = {
-                    callBack.invoke()
-                })
+            showTimeBasedInter{
+                callBack.invoke()
+            }
+
             return
         }
 
 
         Log.d(TAG, "Counter == $inter_counter_start")
 
-        message.invoke(adMessage)
 
         if (inter_counter_start != 0 && mInterstitialAd == null) {
             callBack.invoke()
@@ -671,7 +657,6 @@ object AdmobInterstitialAd {
     }
 
     private fun Activity.showTimeBasedInter(
-        message: (String) -> Unit = {},
         callBack: () -> Unit,
     ) {
 
@@ -680,7 +665,6 @@ object AdmobInterstitialAd {
             return
         }
 
-        message.invoke(adMessage)
 
         if (!isTimeReadyToShow() || mInterstitialAd == null) {
             callBack.invoke()

@@ -205,17 +205,13 @@ object AdmobPreloadInterstitialAd {
     }
 
     fun Activity.showPreloadInter(
-        message: (String) -> Unit = {},
         callBack: () -> Unit,
     ) {
 
         if (isPurchased) {
-            message.invoke("Premium User")
             callBack.invoke()
             return
         }
-
-        message.invoke(adMessage)
 
         if (!isReady()) {
             callBack.invoke()
@@ -228,16 +224,9 @@ object AdmobPreloadInterstitialAd {
         }
 
         if (inter_type == "timer") {
-            showPreloadTimeInter(
-                message = {
-                    message.invoke(adMessage)
-                },
-
-                callBack = {
-                    callBack.invoke()
-                }
-
-            )
+            showPreloadTimeInter {
+                callBack.invoke()
+            }
             return
         }
 
@@ -316,10 +305,11 @@ object AdmobPreloadInterstitialAd {
         pendingActivity = this
         pendingLoadingView = loadingView
         adRunnable = Runnable {
-            if ( !isAppInForeground ||
+            if (!isAppInForeground ||
                 isFinishing ||
                 isDestroyed ||
-                !hasWindowFocus()) {
+                !hasWindowFocus()
+            ) {
                 Log.d(TAG, "Ad skipped: app in background or activity invalid")
                 hideAdLoadingView(loadingView)
                 shouldshowAd = false
@@ -338,7 +328,6 @@ object AdmobPreloadInterstitialAd {
 
     @SuppressLint("StaticFieldLeak")
     fun Activity.showPreloadTimeInter(
-        message: (String) -> Unit = {},
         callBack: () -> Unit
     ) {
 
@@ -351,8 +340,6 @@ object AdmobPreloadInterstitialAd {
             callBack.invoke()
             return
         }
-
-        message.invoke(adMessage)
         Log.d("TAGinginthetimer", "Time is: ${isTimeReadyToShow()}")
 
         if (!isTimeReadyToShow()) {
@@ -418,10 +405,11 @@ object AdmobPreloadInterstitialAd {
         pendingLoadingView = loadingView
         adRunnable = Runnable {
 
-            if ( !isAppInForeground ||
+            if (!isAppInForeground ||
                 isFinishing ||
                 isDestroyed ||
-                !hasWindowFocus()) {
+                !hasWindowFocus()
+            ) {
                 Log.d(TAG, "Ad skipped: app in background or activity invalid")
                 hideAdLoadingView(loadingView)
                 shouldshowAd = false
