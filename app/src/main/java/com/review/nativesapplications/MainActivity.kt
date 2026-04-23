@@ -13,8 +13,7 @@ import com.admobads.AdmobAdManger
 import com.admobads.DefaultAdPlacement
 import com.admobads.ads.AdmobAppOpenAd
 import com.admobads.ads.AdmobInterstitialAd
-import com.admobads.ads.AdmobInterstitialAd.showInterAd
-import com.admobads.ads.AdmobInterstitialAd.showSplashInterAd
+import com.admobads.ads.AdmobInterstitialAd.showSplashAd
 import com.admobads.data.RemoteModel
 import com.google.android.gms.ads.MobileAds
 import com.review.nativesapplications.databinding.ActivityMainBinding
@@ -55,7 +54,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.continueBtn.setOnClickListener {
             Log.d("AdmobInterstitialAd_", "Clicked")
-            showSplashInterAd(
+            showSplashAd(
                 message = {
                     Log.d("AdAVailiblityhasit", it)
                 },

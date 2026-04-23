@@ -353,7 +353,7 @@ object AdmobInterstitialAd {
         }
     }
 
-    fun Activity.showSplashInterAd(
+    fun Activity.showSplashAd(
         message: (String) -> Unit = {},
         callBack: (Boolean) -> Unit
     ) {
