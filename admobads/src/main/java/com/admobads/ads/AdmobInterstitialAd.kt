@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.annotation.Keep
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -67,7 +68,6 @@ object AdmobInterstitialAd {
     private var backCallback: androidx.activity.OnBackPressedCallback? = null
     private var adMessage: String = "Ad Loading"
     private var isAppInForeground = true
-
     private var pendingActivity: Activity? = null
     private var pendingLoadingView: View? = null
     private var interCallback: FullScreenContentCallback? = null
@@ -124,13 +124,15 @@ object AdmobInterstitialAd {
 
     fun setPurchased(isPurchased: Boolean = false) {
         this.isPurchased = isPurchased
-        AdmobPreloadInterstitialAd.setPurchased(isPurchased)
     }
+
+    fun isPurchased(): Boolean = isPurchased
 
     fun setComposed(isComposed: Boolean = false) {
         this.isComposed = isComposed
-        AdmobPreloadInterstitialAd.setComposed(isComposed)
     }
+
+    fun isComposed () : Boolean = isComposed
 
     fun setLoadingDialogBgColor(loadingDialogBgColor: Int) {
         this.dialogBackgroundColor = loadingDialogBgColor
@@ -503,7 +505,7 @@ object AdmobInterstitialAd {
         }
 
         if (inter_type == "timer") {
-            showTimeBasedInter{
+            showTimeBasedInter {
                 callBack.invoke()
             }
 

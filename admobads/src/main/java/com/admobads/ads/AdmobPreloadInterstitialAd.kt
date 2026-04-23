@@ -44,8 +44,6 @@ object AdmobPreloadInterstitialAd {
     private var inter_counter_start_time = 0L
     private var inter_counter_gap_time = 0L
     private var inter_type = "click"
-    private var isPurchased = false
-    private var isComposed = false
     private var backCallback: androidx.activity.OnBackPressedCallback? = null
     private var dialogBackgroundColor = "#F8F8F8".toColorInt()
     private var dialogTextColor = Color.BLACK
@@ -107,13 +105,7 @@ object AdmobPreloadInterstitialAd {
         }
     }
 
-    fun setPurchased(isPurchased: Boolean = false) {
-        this.isPurchased = isPurchased
-    }
 
-    fun setComposed(isPurchased: Boolean = false) {
-        this.isComposed = isPurchased
-    }
 
     fun setLoadingDialogBgColor(loadingDialogBgColor: Int) {
         this.dialogBackgroundColor = loadingDialogBgColor
@@ -170,7 +162,7 @@ object AdmobPreloadInterstitialAd {
 
         AD_UNIT_ID = adunitID
 
-        if (isPurchased) {
+        if (AdmobInterstitialAd.isPurchased()) {
             Log.d(TAG, "Inside Purchased")
             return
         }
@@ -208,7 +200,7 @@ object AdmobPreloadInterstitialAd {
         callBack: () -> Unit,
     ) {
 
-        if (isPurchased) {
+        if (AdmobInterstitialAd.isPurchased()) {
             callBack.invoke()
             return
         }
@@ -331,7 +323,7 @@ object AdmobPreloadInterstitialAd {
         callBack: () -> Unit
     ) {
 
-        if (isPurchased) {
+        if (AdmobInterstitialAd.isPurchased()) {
             callBack.invoke()
             return
         }
@@ -468,7 +460,7 @@ object AdmobPreloadInterstitialAd {
     }
 
     private fun Activity.showAdLoadingView(): View {
-        if (isComposed) {
+        if (AdmobInterstitialAd.isComposed()) {
             val composeView = ComposeView(this).apply {
                 setContent {
                     AdLoadingComposable(
@@ -514,7 +506,7 @@ object AdmobPreloadInterstitialAd {
                     }
                 }
 
-                if (isComposed) {
+                if (AdmobInterstitialAd.isComposed()) {
                     currentComposeLoadingView = null
                 }
             }
