@@ -20,14 +20,9 @@ class BannerActivity : AppCompatActivity() {
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            showInterAd(
-                message = {
-                    Log.d("AdAVailiblityhasit",it)
-                },
-                callBack = {
-                    finish()
-                }
-            )
+            showInterAd{
+                finish()
+            }
         }
 
     }
