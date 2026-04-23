@@ -355,7 +355,13 @@ object AdmobInterstitialAd {
         }
     }
 
-    fun Activity.showSplashInterAd(
+
+    fun Activity.showSplashInter(callBack: (Boolean) -> Unit){
+        showSplashInterAd(callBack)
+    }
+
+
+    private fun Activity.showSplashInterAd(
         callBack: (Boolean) -> Unit
     ) {
 
@@ -482,7 +488,11 @@ object AdmobInterstitialAd {
         }
     }
 
-    fun Activity.showInterAd(
+
+    fun Activity.showInsideInter(callBack: () -> Unit){
+        showInterAd(callBack)
+    }
+    private fun Activity.showInterAd(
         callBack: () -> Unit
     ) {
 

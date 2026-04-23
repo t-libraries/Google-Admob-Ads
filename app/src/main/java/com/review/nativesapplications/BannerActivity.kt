@@ -8,7 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.admobads.ads.AdmobInterstitialAd.showInterAd
+import com.admobads.ads.AdmobInterstitialAd.showInsideInter
 import com.review.nativesapplications.databinding.ActivityBannerAdBinding
 
 class BannerActivity : AppCompatActivity() {
@@ -20,7 +20,7 @@ class BannerActivity : AppCompatActivity() {
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            showInterAd{
+            showInsideInter {
                 finish()
             }
         }

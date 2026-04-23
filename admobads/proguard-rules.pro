@@ -22,3 +22,8 @@
 
 -keep class  com.admobads.data.InterAdModel
 -keep class  com.admobads.data.RemoteModel
+
+-keep class com.admobads.ads.AdmobInterstitialAd { *; }
+-keepclassmembers class com.admobads.ads.AdmobInterstitialAd {
+    public *;
+}
