@@ -3,12 +3,13 @@ package com.review.nativesapplications
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.admobads.ads.AdmobInterstitialAd.showInsideInter
+import com.admobads.ads.AdmobInterstitialAd
 import com.review.nativesapplications.databinding.ActivityBannerAdBinding
 
 class BannerActivity : AppCompatActivity() {
@@ -20,9 +21,16 @@ class BannerActivity : AppCompatActivity() {
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            showInsideInter {
-                finish()
-            }
+            AdmobInterstitialAd.getInstance().showInterAd(
+                this@BannerActivity,
+                message = {
+                    Toast.makeText(this@BannerActivity, it, Toast.LENGTH_SHORT).show()
+                },
+                callBack = {
+                    finish()
+                }
+
+            )
         }
 
     }

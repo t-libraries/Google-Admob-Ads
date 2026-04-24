@@ -5,13 +5,16 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <application>
+    <application
 
-    <activity
-        android:name="com.google.android.gms.ads.AdActivity"
-        android:theme="@style/tlib_AdTheme"
-        tools:replace="android:theme"
-        android:screenOrientation="portrait"/>
+        android:allowBackup="false">
+
+
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/tlib_AdTheme"
+            tools:replace="android:theme" />
 
     </application>
 

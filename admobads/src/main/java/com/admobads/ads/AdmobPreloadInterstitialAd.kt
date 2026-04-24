@@ -30,7 +30,7 @@ import com.google.android.gms.ads.preload.PreloadConfiguration
 import com.google.android.material.card.MaterialCardView
 
 @SuppressLint("StaticFieldLeak")
-object AdmobPreloadInterstitialAd {
+class AdmobPreloadInterstitialAd private constructor() {
     private var AD_UNIT_ID = ""
     private var preloadedAdsCount = 0
     private var appStartTime = 0L
@@ -62,6 +62,17 @@ object AdmobPreloadInterstitialAd {
     private var adMessage: String = "Ad Loading"
 
     private var mInterstitialAd: InterstitialAd? = null
+
+    companion object {
+        @Volatile
+        private var INSTANCE: AdmobPreloadInterstitialAd? = null
+
+        fun getInstance(): AdmobPreloadInterstitialAd {
+            return INSTANCE ?: synchronized(this) {
+                INSTANCE ?: AdmobPreloadInterstitialAd().also { INSTANCE = it }
+            }
+        }
+    }
 
 
     init {
@@ -106,7 +117,6 @@ object AdmobPreloadInterstitialAd {
     }
 
 
-
     fun setLoadingDialogBgColor(loadingDialogBgColor: Int) {
         this.dialogBackgroundColor = loadingDialogBgColor
         AdmobAppOpenAd.setDialogBGColor(loadingDialogBgColor)
@@ -128,6 +138,7 @@ object AdmobPreloadInterstitialAd {
             shouldLoadAd =
                 !(interAdModel.inter_start_after_seconds == 0L && interAdModel.inter_gap_after_seconds == 0L)
             if (!shouldLoadAd) {
+                adMessage = "Both Inside Counters are 0"
                 Log.d(TAG, "Ad loading disabled: both counters are 0")
                 return
             }
@@ -142,6 +153,7 @@ object AdmobPreloadInterstitialAd {
             shouldLoadAd = !(interCounterStart == 0 && interCounterGap == 0)
             if (!shouldLoadAd) {
                 Log.d(TAG, "Ad loading disabled: both counters are 0")
+                adMessage = "Both Inside Counters are 0"
                 return
             }
 
@@ -162,8 +174,9 @@ object AdmobPreloadInterstitialAd {
 
         AD_UNIT_ID = adunitID
 
-        if (AdmobInterstitialAd.isPurchased()) {
+        if (AdmobInterstitialAd.getInstance().isPurchased()) {
             Log.d(TAG, "Inside Purchased")
+            adMessage = "Premium User"
             return
         }
 
@@ -196,32 +209,45 @@ object AdmobPreloadInterstitialAd {
         )
     }
 
-    fun Activity.showPreloadInter(
+    fun showPreloadInter(
+        activity: Activity,
+        message: (String) -> Unit = {},
         callBack: () -> Unit,
     ) {
 
-        if (AdmobInterstitialAd.isPurchased()) {
+        if (AdmobInterstitialAd.getInstance().isPurchased()) {
             callBack.invoke()
             return
         }
 
         if (!isReady()) {
+            message.invoke(adMessage)
             callBack.invoke()
             return
         }
 
         if (!shouldLoadAd) {
+            message.invoke(adMessage)
             callBack.invoke()
             return
         }
 
         if (inter_type == "timer") {
-            showPreloadTimeInter {
-                callBack.invoke()
-            }
+
+            activity.showPreloadTimeInter(
+
+                message = {
+                    message.invoke(it)
+                },
+                callBack = {
+                    callBack.invoke()
+                }
+
+            )
             return
         }
 
+        message.invoke(adMessage)
 
 
         Log.d("TAG", "Counter is: $currentCounter")
@@ -230,6 +256,7 @@ object AdmobPreloadInterstitialAd {
             if (currentCounter != 0)
                 currentCounter--
             Log.d(TAG, "Skipping ad | Counter: $currentCounter")
+            message.invoke(adMessage)
             callBack.invoke()
             return
         }
@@ -264,6 +291,7 @@ object AdmobPreloadInterstitialAd {
                 unblockTouches()
                 GlobalState.isInterShowing = false
                 Log.d(TAG, "Ad Dismissed")
+                adMessage = ""
                 mInterstitialAd = null
                 shouldshowAd = false
                 AdmobAppOpenAd.shouldshowAppOpen()
@@ -275,6 +303,8 @@ object AdmobPreloadInterstitialAd {
                 GlobalState.isInterShowing = false
                 Log.e(TAG, "Show Failed: ${adError.message}")
                 AdmobAppOpenAd.shouldshowAppOpen()
+                adMessage = ""
+                message.invoke("Inside Ad Failed to Show Error : ${adError.message}")
                 shouldshowAd = false
                 callBack.invoke()
             }
@@ -292,18 +322,18 @@ object AdmobPreloadInterstitialAd {
         shouldshowAd = true
         GlobalState.isInterShowing = true
         AdmobAppOpenAd.shouldshowAppOpen(false)
-        blockTouches(this)
-        val loadingView = showAdLoadingView()
-        pendingActivity = this
+        blockTouches(activity)
+        val loadingView = activity.showAdLoadingView()
+        pendingActivity = activity
         pendingLoadingView = loadingView
         adRunnable = Runnable {
             if (!isAppInForeground ||
-                isFinishing ||
-                isDestroyed ||
-                !hasWindowFocus()
+                activity.isFinishing ||
+                activity.isDestroyed ||
+                !activity.hasWindowFocus()
             ) {
                 Log.d(TAG, "Ad skipped: app in background or activity invalid")
-                hideAdLoadingView(loadingView)
+                activity.hideAdLoadingView(loadingView)
                 shouldshowAd = false
                 unblockTouches()
                 AdmobAppOpenAd.shouldshowAppOpen(true)
@@ -312,29 +342,31 @@ object AdmobPreloadInterstitialAd {
                 return@Runnable
             }
             ad.fullScreenContentCallback = callback
-            ad.show(this)
-            hideAdLoadingView(loadingView)
+            ad.show(activity)
+            activity.hideAdLoadingView(loadingView)
         }
         adRunnable?.let { handler.postDelayed(it, 1500) }
     }
 
     @SuppressLint("StaticFieldLeak")
     fun Activity.showPreloadTimeInter(
+        message: (String) -> Unit = {},
         callBack: () -> Unit
     ) {
 
-        if (AdmobInterstitialAd.isPurchased()) {
+        if (AdmobInterstitialAd.getInstance().isPurchased()) {
             callBack.invoke()
             return
         }
 
         if (!shouldLoadAd) {
+            message.invoke(adMessage)
             callBack.invoke()
             return
         }
-        Log.d("TAGinginthetimer", "Time is: ${isTimeReadyToShow()}")
 
         if (!isTimeReadyToShow()) {
+            message.invoke(adMessage)
             callBack.invoke()
             return
         }
@@ -342,9 +374,12 @@ object AdmobPreloadInterstitialAd {
 
         val ad = InterstitialAdPreloader.pollAd(AD_UNIT_ID)
         ad ?: run {
+            message.invoke(adMessage)
             callBack.invoke()
             return
         }
+
+        message.invoke(adMessage)
 
         mInterstitialAd = ad
 
@@ -360,6 +395,7 @@ object AdmobPreloadInterstitialAd {
                 GlobalState.isInterShowing = false
                 shouldshowAd = false
                 mInterstitialAd = null
+                adMessage = ""
                 lastInterShownTime = System.currentTimeMillis()
                 AdmobAppOpenAd.shouldshowAppOpen()
                 isFirstTimeInterShown = true
@@ -371,6 +407,8 @@ object AdmobPreloadInterstitialAd {
                 unblockTouches()
                 GlobalState.isInterShowing = false
                 mInterstitialAd = null
+                adMessage = ""
+                message.invoke("Inside Ad Failed to Show Error : ${adError.message}")
                 lastInterShownTime = System.currentTimeMillis()
                 AdmobAppOpenAd.shouldshowAppOpen()
                 isFirstTimeInterShown = true
@@ -460,7 +498,7 @@ object AdmobPreloadInterstitialAd {
     }
 
     private fun Activity.showAdLoadingView(): View {
-        if (AdmobInterstitialAd.isComposed()) {
+        if (AdmobInterstitialAd.getInstance().isComposed()) {
             val composeView = ComposeView(this).apply {
                 setContent {
                     AdLoadingComposable(
@@ -506,7 +544,7 @@ object AdmobPreloadInterstitialAd {
                     }
                 }
 
-                if (AdmobInterstitialAd.isComposed()) {
+                if (AdmobInterstitialAd.getInstance().isComposed()) {
                     currentComposeLoadingView = null
                 }
             }

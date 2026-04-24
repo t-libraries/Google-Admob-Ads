@@ -19,7 +19,7 @@ class MyApplication : Application() {
 
         MobileAds.initialize(this)
 
-        AdmobInterstitialAd.initInterFromConfig(
+        AdmobInterstitialAd.getInstance().initInterFromConfig(
             this@MyApplication,
             InterAdModel(
                 inter_type = "timer",
