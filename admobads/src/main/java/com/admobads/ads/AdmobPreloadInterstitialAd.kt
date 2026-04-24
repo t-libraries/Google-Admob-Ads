@@ -181,10 +181,15 @@ class AdmobPreloadInterstitialAd private constructor() {
         }
 
         Log.d(TAG, "Inside  ${interAdModel}")
+        Log.d(TAG, "Inside ID  ${interAdModel.inter_type}")
+        Log.d(TAG, "Inside ID  $AD_UNIT_ID")
 
         val config = PreloadConfiguration.Builder(AD_UNIT_ID)
             .setBufferSize(2)
             .build()
+
+
+        Log.d(TAG, "Inside Config  $config")
 
         InterstitialAdPreloader.start(
             AD_UNIT_ID,

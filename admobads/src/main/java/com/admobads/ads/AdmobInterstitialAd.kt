@@ -26,6 +26,7 @@ import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.card.MaterialCardView
@@ -85,6 +86,7 @@ class AdmobInterstitialAd private constructor() {
 
 
     init {
+
         ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
                 isAppInForeground = true
@@ -163,6 +165,8 @@ class AdmobInterstitialAd private constructor() {
         inside_inter_ad_id: String
     ) {
 
+        MobileAds.initialize(context)
+
         if (isInterIntialized) {
             return
         }
@@ -195,6 +199,7 @@ class AdmobInterstitialAd private constructor() {
             }
 
         } else {
+            Log.d(TAG, "API onStart")
             AdmobPreloadInterstitialAd.getInstance().start(
                 config,
                 inside_inter_ad_id

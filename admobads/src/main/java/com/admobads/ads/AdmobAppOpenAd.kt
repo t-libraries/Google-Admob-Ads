@@ -82,12 +82,10 @@ class AdmobAppOpenAd(
             return
         }
 
-
-        isShowingAd = true
-
         currentActivity?.let {
             blockTouches(it)
         }
+        isShowingAd = true
         loadingView = currentActivity?.showAdLoadingView()
 
         isLoadingAd = true
@@ -127,6 +125,9 @@ class AdmobAppOpenAd(
                 }
             }
         } catch (e: Exception) {
+            isShowingAd= false
+            isLoadingAd = false
+            unblockTouches()
             e.printStackTrace()
         }
 
@@ -176,13 +177,13 @@ class AdmobAppOpenAd(
                 isShowingAd = false
                 unblockTouches()
             }
+        }?:run{
+            appOpenAd = null
+            isShowingAd = false
+            unblockTouches()
         }
     }
 
-
-    /**
-     * Creates and returns ad request.
-     */
     private val adRequest: AdRequest
         get() {
             return AdRequest.Builder().build()
