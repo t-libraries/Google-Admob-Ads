@@ -154,6 +154,13 @@ public class AdmobNativeAd {
     }
 
     private void displayNativeAd(NativeAd nativeAd) {
+        nativeAd.setOnPaidEventListener(
+                AdRevenueTracker.paidEventListener(
+                        id,
+                        AdRevenueTracker.FORMAT_NATIVE,
+                        TAG
+                )
+        );
         NativeAdView nativeView = createNativeView();
         bindNativeAd(nativeAd, nativeView);
         nativeAdContainer.removeAllViews();

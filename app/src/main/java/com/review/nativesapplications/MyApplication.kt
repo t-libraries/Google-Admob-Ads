@@ -1,8 +1,10 @@
 package com.review.nativesapplications
 
 import android.app.Application
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
+import com.admobads.AdmobAdManger
 import com.admobads.ads.AdmobInterstitialAd
 import com.admobads.data.InterAdModel
 import com.google.android.gms.ads.MobileAds
@@ -31,6 +33,10 @@ class MyApplication : Application() {
             ),
             "ca-app-pub-3940256099942544/1033173712"
         )
+
+        AdmobAdManger.setAdRevenueListener(1.30) { eventName, params ->
+            Log.d("Fireasdfhaskdjflsadfj", "event name = $eventName and params are = $params")
+        }
 
         val appLocale: LocaleListCompat =
             LocaleListCompat.forLanguageTags("en")

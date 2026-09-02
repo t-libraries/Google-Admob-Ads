@@ -85,6 +85,7 @@ class AdmobAppOpenAd(
         currentActivity?.let {
             blockTouches(it)
         }
+
         isShowingAd = true
         loadingView = currentActivity?.showAdLoadingView()
 
@@ -99,6 +100,12 @@ class AdmobAppOpenAd(
                     adMessage = "App Open Loaded"
                     currentActivity?.hideAdLoadingView(loadingView)
                     showAdIfAvailable()
+                    appOpenAd.onPaidEventListener = AdRevenueTracker.paidEventListener(
+                        adUnitId = appOpenAd.adUnitId,
+                        adFormat = AdRevenueTracker.FORMAT_APP_OPEN,
+                        logTag = LOG_TAG
+                    )
+
                 }
 
                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
@@ -125,7 +132,7 @@ class AdmobAppOpenAd(
                 }
             }
         } catch (e: Exception) {
-            isShowingAd= false
+            isShowingAd = false
             isLoadingAd = false
             unblockTouches()
             e.printStackTrace()
@@ -167,6 +174,7 @@ class AdmobAppOpenAd(
             override fun onAdShowedFullScreenContent() {
                 Log.d(LOG_TAG, "onAdShowedFullScreenContent.")
             }
+
         }
         isShowingAd = true
         currentActivity?.let {
@@ -177,7 +185,7 @@ class AdmobAppOpenAd(
                 isShowingAd = false
                 unblockTouches()
             }
-        }?:run{
+        } ?: run {
             appOpenAd = null
             isShowingAd = false
             unblockTouches()

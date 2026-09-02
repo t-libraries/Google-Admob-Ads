@@ -163,6 +163,7 @@ class AdmobBannerAd(
                     BannerAdType.STANDARD,
                     BannerAdType.LARGE_BANNER,
                     BannerAdType.MEDIUM_RECTANGLE -> loadStandardBanner()
+
                     BannerAdType.COLLAPSIBLE -> loadCollapsibleBanner(position = "top")
                 }
             }
@@ -175,6 +176,11 @@ class AdmobBannerAd(
         adView = AdView(context).apply {
             this.adUnitId = adUnitId
             setAdSize(adSize)
+            onPaidEventListener = AdRevenueTracker.paidEventListener(
+                adUnitId = adUnitId,
+                adFormat = AdRevenueTracker.FORMAT_BANNER,
+                logTag = TAG
+            )
         }
         adsLayout.addView(adView)
     }
@@ -209,6 +215,7 @@ class AdmobBannerAd(
                 Log.d(TAG, "Ad is loaded")
                 showAdViews()
             }
+
         }
     }
 
@@ -251,8 +258,16 @@ class AdmobBannerAd(
     }
 
     fun destroy() {
+
+        if (::adView.isInitialized) {
+            adView.onPaidEventListener = null
+            adView.destroy()
+        }
         bannerAdContainer.removeAllViews()
-        adView.destroy()
+
+        adsLayout.removeAllViews()
+        skeletonConstraintLayout = null
+        initialLayoutComplete = false
     }
 
 
@@ -296,7 +311,6 @@ class AdmobBannerAd(
         }
 
 
-
 }
 
 enum class BannerAdType {
@@ -317,6 +331,7 @@ enum class BannerAdType {
         }
     }
 }
+
 
 enum class BannerPosition {
     TOP,

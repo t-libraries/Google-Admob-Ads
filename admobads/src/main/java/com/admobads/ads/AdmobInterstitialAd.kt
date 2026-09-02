@@ -354,6 +354,11 @@ class AdmobInterstitialAd private constructor() {
             override fun onAdLoaded(interstitialAd: InterstitialAd) {
                 adMessage = "Splash Ad Loaded"
                 isPreviousAdLoading = false
+                interstitialAd.onPaidEventListener = AdRevenueTracker.paidEventListener(
+                    adUnitId = interstitialAd.adUnitId,
+                    adFormat = AdRevenueTracker.FORMAT_INTERSTITIAL,
+                    logTag = TAG
+                )
                 splashInterstitialAd = interstitialAd
                 onAdLoaded.invoke()
             }
@@ -487,6 +492,11 @@ class AdmobInterstitialAd private constructor() {
         val callback = object : InterstitialAdLoadCallback() {
             override fun onAdLoaded(interstitialAd: InterstitialAd) {
                 isPreviousAdLoading = false
+                interstitialAd.onPaidEventListener = AdRevenueTracker.paidEventListener(
+                    adUnitId = interstitialAd.adUnitId,
+                    adFormat = AdRevenueTracker.FORMAT_INTERSTITIAL,
+                    logTag = TAG
+                )
                 mInterstitialAd = interstitialAd
                 adMessage = "Inside Ad Loaded"
                 Log.d(TAG, "AdmobInterstitialAd: onAdLoaded")
@@ -826,5 +836,69 @@ class AdmobInterstitialAd private constructor() {
         }
     }
 
+    fun destroy() {
+        handler.removeCallbacksAndMessages(null)
+        adRunnable = null
+
+        pendingActivity?.let { activity ->
+            pendingLoadingView?.let { loadingView ->
+                activity.hideAdLoadingView(loadingView)
+            }
+        }
+
+        currentComposeLoadingView?.let { view ->
+            (view.parent as? ViewGroup)?.removeView(view)
+
+            if (view is ComposeView) {
+                try {
+                    view.disposeComposition()
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error disposing Compose loading view: ${e.message}")
+                }
+            }
+        }
+        currentComposeLoadingView = null
+
+        blockedActivity?.let { activity ->
+            try {
+                activity.window.clearFlags(
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "Error clearing blocked activity flags: ${e.message}")
+            }
+        }
+
+        backCallback?.remove()
+        backCallback = null
+        blockedActivity = null
+
+        pendingActivity = null
+        pendingLoadingView = null
+
+        mInterstitialAd?.fullScreenContentCallback = null
+        splashInterstitialAd?.fullScreenContentCallback = null
+
+        mInterstitialAd = null
+        splashInterstitialAd = null
+
+        interCallback = null
+        shouldshowAd = false
+        shouldLoadAd = false
+        isPreviousAdLoading = false
+        isTimeAdLoaded = false
+        isFirstTimeInterShown = false
+
+        appStartTime = 0L
+        lastInterShownTime = 0L
+        inter_counter_start_time = 0L
+        load_inter_counter_start_before = 0L
+        inter_counter_gap_time = 0L
+        load_inter_counter_gap_before = 0L
+
+        isInterIntialized = false
+
+        GlobalState.isInterShowing = false
+    }
 
 }

@@ -4,6 +4,8 @@ import android.app.Activity
 import android.view.View
 import android.widget.FrameLayout
 import androidx.core.graphics.toColorInt
+import com.admobads.ads.AdRevenueListener
+import com.admobads.ads.AdRevenueTracker
 import com.admobads.ads.AdmobAppOpenAd
 import com.admobads.ads.AdmobBannerAd
 import com.admobads.ads.AdmobInterstitialAd
@@ -32,6 +34,10 @@ class AdmobAdManger(
             isComposed = value
             AdmobInterstitialAd.getInstance().setComposed(value)
             AdmobAppOpenAd.setComposed(value)
+        }
+
+        fun setAdRevenueListener(revenueMultiplier: Double , listener: AdRevenueListener?) {
+            AdRevenueTracker.setListener(revenueMultiplier,listener)
         }
     }
 

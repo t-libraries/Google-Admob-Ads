@@ -280,6 +280,11 @@ class AdmobPreloadInterstitialAd private constructor() {
             return
         }
 
+        ad.onPaidEventListener = AdRevenueTracker.paidEventListener(
+            adUnitId = ad.adUnitId.ifEmpty { AD_UNIT_ID },
+            adFormat = AdRevenueTracker.FORMAT_INTERSTITIAL,
+            logTag = TAG
+        )
         mInterstitialAd = ad
 
         preloadedAdsCount--
@@ -386,6 +391,11 @@ class AdmobPreloadInterstitialAd private constructor() {
 
         message.invoke(adMessage)
 
+        ad.onPaidEventListener = AdRevenueTracker.paidEventListener(
+            adUnitId = ad.adUnitId.ifEmpty { AD_UNIT_ID },
+            adFormat = AdRevenueTracker.FORMAT_INTERSTITIAL,
+            logTag = TAG
+        )
         mInterstitialAd = ad
 
         val callback = object : FullScreenContentCallback() {
