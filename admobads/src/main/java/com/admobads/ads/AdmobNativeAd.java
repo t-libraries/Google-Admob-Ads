@@ -322,6 +322,7 @@ public class AdmobNativeAd {
         }
     }
 
+
     public View getloadingtype(Integer type) {
         if (type == null)
             return LayoutInflater.from(ctx).inflate(R.layout.tlib_loading_adaptive_progress, nativeAdContainer, false);

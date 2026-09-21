@@ -80,7 +80,7 @@ object AdRevenueTracker {
             putString("ad_unit_name", adUnitId)
             putString("ad_format", adFormat)
             putString("PriceAccuracy", "BID")
-            putString("revenue_precision", adValue.precisionType.toString())
+            putInt("revenue_precision", adValue.precisionType)
         }
 
         return revenue to params
