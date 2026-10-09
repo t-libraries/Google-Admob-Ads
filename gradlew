@@ -92,10 +92,39 @@ if [ -n "$JAVA_HOME" ] ; then
         JAVACMD="$JAVA_HOME/bin/java"
     fi
     if [ ! -x "$JAVACMD" ] ; then
-        die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
+        # JitPack's latest image exports JAVA_HOME=/usr/lib/jvm/jdk-11 even though
+        # that directory is not installed. The image JDK is OpenJDK 17.
+        ORIGINAL_JAVA_HOME=$JAVA_HOME
+        if command -v java >/dev/null 2>&1 ; then
+            JAVA_BIN=`command -v java`
+            if [ -L "$JAVA_BIN" ] ; then
+                JAVA_BIN=`readlink -f "$JAVA_BIN"`
+            fi
+            JAVA_HOME=`cd "$(dirname "$JAVA_BIN")/.." && pwd`
+            if [ -x "$JAVA_HOME/bin/java" ] ; then
+                JAVACMD="$JAVA_HOME/bin/java"
+            fi
+        fi
+        if [ ! -x "$JAVACMD" ] ; then
+            for candidate in \
+                /usr/lib/jvm/java-17-openjdk-amd64 \
+                /usr/lib/jvm/java-21-openjdk-amd64 \
+                /usr/lib/jvm/jdk-17
+            do
+                if [ -x "$candidate/bin/java" ] ; then
+                    JAVA_HOME=$candidate
+                    JAVACMD="$JAVA_HOME/bin/java"
+                    break
+                fi
+            done
+        fi
+        if [ ! -x "$JAVACMD" ] ; then
+            die "ERROR: JAVA_HOME is set to an invalid directory: $ORIGINAL_JAVA_HOME
 
 Please set the JAVA_HOME variable in your environment to match the
 location of your Java installation."
+        fi
+        export JAVA_HOME
     fi
 else
     JAVACMD="java"

@@ -1,0 +1,8 @@
+# AGP 8.9 requires JDK 17. JitPack otherwise points JAVA_HOME at
+# /usr/lib/jvm/jdk-11, which is not installed on the current build image.
+jdk:
+  - openjdk17
+before_install:
+  - git config --global --add safe.directory /build || true
+  - git config --global --add safe.directory '*' || true
+  - bash ./scripts/jitpack-setup.sh
