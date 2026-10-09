@@ -35,6 +35,7 @@ class MyApplication : Application() {
         )
 
         AdmobAdManger.setAdRevenueListener(1.30) { eventName, params ->
+            Log.d("onasdfjslkdf" , "sdfsadfsdfsadfs")
             Log.d("Fireasdfhaskdjflsadfj", "event name = $eventName and params are = $params")
         }
 

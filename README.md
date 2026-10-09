@@ -1,38 +1,32 @@
-# Google AdMob Ads
+# Google AdMob Ads — Exposed Methods & Implementation
 
-An Android library for loading **Native**, **Banner**, **Interstitial**, and **App Open** ads with built-in templates, skeleton loaders, and a single host-app callback for impression-level revenue.
+Complete public API of the `admobads` library, with a working implementation for **every ad type**.
 
 [![Release](https://jitpack.io/v/t-libraries/Google-Admob-Ads.svg)](https://jitpack.io/#t-libraries/Google-Admob-Ads)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![minSdk](https://img.shields.io/badge/minSdk-23-green.svg)](https://developer.android.com/google/play/requirements/target-sdk)
-[![AdMob](https://img.shields.io/badge/AdMob-25.4.0-orange.svg)](https://developers.google.com/admob/android/quick-start)
 
-## Features
+---
 
-- Native ads with multiple templates (small / adaptive, medium, large, large_1)
-- Banner ads: standard, large, medium rectangle, collapsible (top / bottom)
-- Splash and in-app interstitial ads (click counter or timer)
-- Interstitial preloading via AdMob Preloader (`loading_type = "api"`)
-- App Open ads on process foreground, with activity exclusions
-- Skeleton loading layouts while ads load
-- Premium / IAP flag that hides and skips all ads
-- Jetpack Compose or XML loading dialogs
-- Impression-level paid events forwarded to the host app (Firebase Analytics or any other tracker)
+## Table of contents
 
-## Requirements
-
-| Item | Value |
-|---|---|
-| minSdk | 23 |
-| Language | Kotlin / Java |
-| Google Mobile Ads | `play-services-ads` 25.4.0 |
-| Distribution | [JitPack](https://jitpack.io/#t-libraries/Google-Admob-Ads) |
+1. [Installation](#1-installation)
+2. [Public API index](#2-public-api-index)
+3. [Data models](#3-data-models)
+4. [Global controls — `AdmobAdManger`](#4-global-controls--admobadmanger)
+5. [Native ads](#5-native-ads)
+6. [Banner ads](#6-banner-ads)
+7. [Interstitial ads](#7-interstitial-ads)
+8. [Preload interstitial ads](#8-preload-interstitial-ads)
+9. [App Open ads](#9-app-open-ads)
+10. [Impression revenue](#10-impression-revenue)
+11. [Optional utilities](#11-optional-utilities)
+12. [End-to-end application sample](#12-end-to-end-application-sample)
+13. [Test ad units](#13-test-ad-units)
 
 ---
 
 ## 1. Installation
-
-### Gradle (Groovy)
 
 ```gradle
 dependencyResolutionManagement {
@@ -50,243 +44,416 @@ dependencies {
 }
 ```
 
-### Gradle (Kotlin DSL)
-
-```kotlin
-dependencyResolutionManagement {
-    repositories {
-        google()
-        mavenCentral()
-        maven(url = "https://jitpack.io")
-    }
-}
-```
-
-```kotlin
-dependencies {
-    implementation("com.github.t-libraries:Google-Admob-Ads:Tag")
-}
-```
-
-Replace `Tag` with the latest [release / JitPack tag](https://jitpack.io/#t-libraries/Google-Admob-Ads).
-
----
-
-## 2. App setup
+Replace `Tag` with the latest [JitPack tag](https://jitpack.io/#t-libraries/Google-Admob-Ads).
 
 ### Manifest
 
-Add your AdMob App ID. Use a Google test ID while developing.
-
 ```xml
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<uses-permission android:name="android.permission.INTERNET" />
 
-    <uses-permission android:name="android.permission.INTERNET" />
-
-    <application
-        android:name=".MyApplication"
-        ...>
-
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="@string/appid" />
-
-    </application>
-</manifest>
+<application android:name=".MyApplication" ...>
+    <meta-data
+        android:name="com.google.android.gms.ads.APPLICATION_ID"
+        android:value="@string/appid" />
+</application>
 ```
 
 ```xml
-<!-- res/values/strings.xml or build.gradle resValue -->
 <string name="appid">ca-app-pub-3940256099942544~3347511713</string>
 ```
 
-### Application class
+---
 
-Initialize interstitial config and (optionally) the revenue listener once:
+## 2. Public API index
 
-```kotlin
-class MyApplication : Application() {
+| Class / object | Package | Role |
+|---|---|---|
+| `AdmobAdManger` | `com.admobads` | Native + banner loader, premium / Compose / revenue entry point |
+| `DefaultAdPlacement` | `com.admobads` | Fallback layout when `RemoteModel` is null or `id` is empty |
+| `RemoteModel` | `com.admobads.data` | Remote Config JSON for native / banner |
+| `InterAdModel` | `com.admobads.data` | Interstitial click / timer / preload config |
+| `AdmobNativeAd` | `com.admobads.ads` | Native ad loader (all templates) |
+| `AdmobBannerAd` | `com.admobads.ads` | Banner ad loader (all sizes) |
+| `BannerAdType` | `com.admobads.ads` | Banner size enum |
+| `BannerPosition` | `com.admobads.ads` | Collapsible banner collapse edge |
+| `AdmobInterstitialAd` | `com.admobads.ads` | Splash + in-app interstitial singleton |
+| `AdmobPreloadInterstitialAd` | `com.admobads.ads` | AdMob Preloader path (`loading_type = "api"`) |
+| `AdmobAppOpenAd` | `com.admobads.ads` | App Open on process foreground |
+| `AdRevenueTracker` | `com.admobads.ads` | Paid-event bundle + host-app callback |
+| `AdRevenueListener` | `com.admobads.ads` | `{ eventName, params -> }` |
+| `AdLoadingComposable` | `com.admobads.ads.utils` | Compose loading overlay |
+| `BlurUtils` | `com.admobads.utils` | Optional background blur |
 
-    companion object {
-        var myApplication: MyApplication? = null
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-        myApplication = this
-
-        AdmobInterstitialAd.getInstance().initInterFromConfig(
-            this,
-            InterAdModel(
-                inter_type = "timer",          // "timer" or "click"
-                loading_type = "manual",       // "manual" or "api" (preloader)
-                inter_counter_start = 1,
-                inter_counter_gap = 1,
-                inter_start_after_seconds = 15,
-                inter_start_load_before_seconds = 5,
-                inter_gap_after_seconds = 30,
-                inter_gap_load_before_seconds = 25
-            ),
-            "ca-app-pub-3940256099942544/1033173712"
-        )
-
-        AdmobAdManger.setAdRevenueListener(1.30) { eventName, params ->
-            FirebaseAnalytics.getInstance(this).logEvent(eventName, params)
-        }
-    }
-}
-```
-
-Register `MyApplication` in the manifest with `android:name=".MyApplication"`.
+Host apps normally use **`AdmobAdManger` + `AdmobInterstitialAd` + `AdmobAppOpenAd`**. Direct `AdmobNativeAd` / `AdmobBannerAd` / `AdmobPreloadInterstitialAd` calls are also supported.
 
 ---
 
-## 3. Native and Banner ads
+## 3. Data models
 
-Use `AdmobAdManger` with a `MaterialCardView` container and an inner `FrameLayout`.
+### `RemoteModel`
 
-### XML
+```kotlin
+data class RemoteModel(
+    val id: String = "",
+    val ad_format: String = "",
+    val ad_type: Int = 3,
+    val hide: Boolean = false,
+    val cta_color: String = "#F42727"
+)
+```
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `id` | `String` | `""` | Ad unit ID. Empty uses `DefaultAdPlacement`. |
+| `ad_format` | `String` | `""` | `"banner"` → banner. Any other value → native. |
+| `ad_type` | `Int` | `3` | Native or banner size. See tables below. |
+| `hide` | `Boolean` | `false` | `true` hides the container. |
+| `cta_color` | `String` | `"#F42727"` | Native CTA hex color. |
+
+Gson-annotated (`@SerializedName`), so it can be parsed from Firebase Remote Config JSON.
+
+### `InterAdModel`
+
+```kotlin
+data class InterAdModel(
+    val inter_type: String = "timer",
+    var loading_type: String = "manual",
+    val inter_counter_start: Int = 0,
+    val inter_counter_gap: Int = 0,
+    val inter_start_after_seconds: Long = 0,
+    val inter_start_load_before_seconds: Long = 0,
+    val inter_gap_after_seconds: Long = 0,
+    val inter_gap_load_before_seconds: Long = 0
+)
+```
+
+| Field | Values | Description |
+|---|---|---|
+| `inter_type` | `"click"` / `"timer"` | Show by click count or elapsed time. |
+| `loading_type` | `"manual"` / `"api"` | On-demand load, or AdMob Preloader. |
+| `inter_counter_start` | `Int` | Clicks before the first in-app interstitial. |
+| `inter_counter_gap` | `Int` | Clicks between later interstitials. |
+| `inter_start_after_seconds` | `Long` | Seconds after app start before first timer ad. |
+| `inter_start_load_before_seconds` | `Long` | Load first timer ad this many seconds early. |
+| `inter_gap_after_seconds` | `Long` | Seconds between later timer ads. |
+| `inter_gap_load_before_seconds` | `Long` | Load next timer ad this many seconds early. |
+
+If both start and gap counters **or** both start and gap times are `0`, in-app interstitials are disabled.
+
+---
+
+## 4. Global controls — `AdmobAdManger`
+
+Constructor:
+
+```kotlin
+AdmobAdManger(
+    context: Activity,
+    adContainer: MaterialCardView,
+    adLayout: FrameLayout
+)
+```
+
+### Companion methods
+
+| Method | Signature | Description |
+|---|---|---|
+| `isPurchased` | `fun isPurchased(value: Boolean = false)` | Premium flag. Hides native/banner and skips interstitial + app open. |
+| `isComposed` | `fun isComposed(value: Boolean = false)` | `true` uses Compose loading overlay instead of XML. |
+| `setAdRevenueListener` | `fun setAdRevenueListener(revenueMultiplier: Double, listener: AdRevenueListener?)` | Host-app paid-event callback. |
+
+### Instance methods (fluent)
+
+| Method | Signature | Default | Description |
+|---|---|---|---|
+| `setCtaPostion` | `fun setCtaPostion(ctaPosition: String): AdmobAdManger` | `"bottom"` | Native CTA `"top"` or `"bottom"`. |
+| `setTextColor` | `fun setTextColor(headingtextColor: Int, bodytextColor: Int): AdmobAdManger` | `0` (theme default) | Native headline then body color. |
+| `setBannerCollapsiblePosition` | `fun setBannerCollapsiblePosition(position: BannerPosition): AdmobAdManger` | `BOTTOM` | Collapse edge for collapsible banners. |
+| `setSkeltonColor` | `fun setSkeltonColor(color: Int): AdmobAdManger` | `#E6E6E6` | Skeleton shimmer color. |
+| `setMargintoNative` | `fun setMargintoNative(start: Int, end: Int): AdmobAdManger` | `0, 0` | Horizontal native margins in **dp**. |
+| `loadAd` | `fun loadAd(modelItem: RemoteModel?, default_ad_format: DefaultAdPlacement = BANNER)` | — | Loads native or banner from `RemoteModel`. |
+
+### `DefaultAdPlacement`
+
+```kotlin
+enum class DefaultAdPlacement { NATIVE, BANNER }
+```
+
+Used when `modelItem == null` or `id == ""`.
+
+### Usage
+
+```kotlin
+AdmobAdManger.isPurchased(false)
+AdmobAdManger.isComposed(false)
+AdmobAdManger.setAdRevenueListener(1.30) { eventName, params ->
+    FirebaseAnalytics.getInstance(this).logEvent(eventName, params)
+}
+
+AdmobAdManger(this, binding.adContainer, binding.adLayout)
+    .setCtaPostion("bottom")
+    .setTextColor("#000000".toColorInt(), "#4E4E4E".toColorInt())
+    .setBannerCollapsiblePosition(BannerPosition.BOTTOM)
+    .setSkeltonColor("#E6E6E6".toColorInt())
+    .setMargintoNative(10, 10)
+    .loadAd(remoteModel, DefaultAdPlacement.BANNER)
+```
+
+---
+
+## 5. Native ads
+
+XML container (required by `AdmobAdManger`):
 
 ```xml
 <com.google.android.material.card.MaterialCardView
     android:id="@+id/adContainer"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    app:cardBackgroundColor="#f1f0f8"
-    app:cardCornerRadius="@dimen/_8sdp"
     app:strokeWidth="0dp">
 
     <FrameLayout
         android:id="@+id/adLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-
 </com.google.android.material.card.MaterialCardView>
 ```
 
-### Kotlin
-
-```kotlin
-val item = RemoteModel(
-    id = "ca-app-pub-3940256099942544/1044960115",
-    ad_format = "native",   // "banner" or "native"
-    ad_type = 1,
-    hide = false,
-    cta_color = "#F42727"
-)
-
-AdmobAdManger(this, binding.adContainer, binding.adLayout)
-    .setBannerCollapsiblePosition(BannerPosition.BOTTOM) // optional, default BOTTOM
-    .setMargintoNative(14, 14)                           // optional, default 0, 0
-    .setSkeltonColor("#C8C8C8".toColorInt())             // optional
-    .setCtaPostion("bottom")                             // "top" or "bottom"
-    .setTextColor(
-        headingtextColor = "#000000".toColorInt(),
-        bodytextColor = "#4E4E4E".toColorInt()
-    )
-    .loadAd(
-        item,
-        DefaultAdPlacement.BANNER // used when model is null or id is empty
-    )
-```
-
-### Java
-
-```java
-RemoteModel item = new RemoteModel(
-        "ca-app-pub-3940256099942544/1044960115",
-        "native",
-        1,
-        false,
-        "#F42727"
-);
-
-new AdmobAdManger(this, adContainer, adLayout)
-        .setBannerCollapsiblePosition(BannerPosition.BOTTOM)
-        .setMargintoNative(14, 14)
-        .setSkeltonColor(Color.parseColor("#C8C8C8"))
-        .setCtaPostion("bottom")
-        .setTextColor(Color.parseColor("#000000"), Color.parseColor("#4E4E4E"))
-        .loadAd(item, DefaultAdPlacement.BANNER);
-```
-
-If `RemoteModel` is `null`, `hide = true`, or `id` is empty, the manager either hides the container or falls back to `DefaultAdPlacement`.
-
-### `RemoteModel`
-
-| Field | Type | Description |
-|---|---|---|
-| `id` | `String` | Ad unit ID. Empty string uses `DefaultAdPlacement`. |
-| `ad_format` | `String` | `"banner"` loads a banner. Any other value loads a native ad. |
-| `ad_type` | `Int` | Layout / size. See tables below. |
-| `hide` | `Boolean` | `true` hides the ad container. |
-| `cta_color` | `String` | Native CTA button color, e.g. `"#F42727"`. |
-
-This model is Gson-annotated, so it can be parsed from Remote Config JSON.
-
 ### Native `ad_type`
 
-| `ad_type` | Template |
-|---|---|
-| `1` | Large Native 1 |
-| `2` | Large Native |
-| `3` | Small / Adaptive Native (default) |
-| `4` | Medium Native |
+| `ad_type` | Template | CTA layouts |
+|---|---|---|
+| `1` | Large Native 1 | Bottom (`tlib_large_variant_one_bottom`) |
+| `2` | Large Native | Top / bottom (`tlib_large_variant_two_*`) |
+| `3` | Small / Adaptive (default) | Top / bottom (`tlib_large_variant_one_top` / `tlib_adaptive_variant_one_bottom`) |
+| `4` | Medium Native | Top / bottom (`tlib_medium_variant_one_*`) |
 
-CTA placement is controlled with `setCtaPostion("top")` or `setCtaPostion("bottom")`.
+Set CTA with `.setCtaPostion("top")` or `"bottom"`.
 
-### Banner `ad_type`
+### Via `AdmobAdManger` (recommended)
 
-| `ad_type` | Size |
-|---|---|
-| `1` | Collapsible adaptive banner |
-| `2` | Standard adaptive banner (default) |
-| `3` | Medium rectangle |
-| `4` | Large banner |
+```kotlin
+fun loadNative(
+    adType: Int,
+    ctaPosition: String = "bottom",
+    ctaColor: String = "#F42727"
+) {
+    AdmobAdManger(this, binding.adContainer, binding.adLayout)
+        .setCtaPostion(ctaPosition)
+        .setTextColor("#000000".toColorInt(), "#4E4E4E".toColorInt())
+        .setSkeltonColor("#E6E6E6".toColorInt())
+        .setMargintoNative(12, 12)
+        .loadAd(
+            RemoteModel(
+                id = "ca-app-pub-3940256099942544/2247696110",
+                ad_format = "native",
+                ad_type = adType,
+                hide = false,
+                cta_color = ctaColor
+            ),
+            DefaultAdPlacement.NATIVE
+        )
+}
 
-Collapsible banners use `setBannerCollapsiblePosition(BannerPosition.TOP)` or `BannerPosition.BOTTOM`.
+loadNative(adType = 1) // Large Native 1
+loadNative(adType = 2, ctaPosition = "top") // Large
+loadNative(adType = 3) // Small / Adaptive
+loadNative(adType = 4) // Medium
+```
 
-### Native templates
+### Direct `AdmobNativeAd` methods
 
-<p align="center">
-  <img src="./images/banner.png" alt="Banner native" width="220" />
-  <img src="./images/small.png" alt="Small / adaptive native" width="220" />
-</p>
+```kotlin
+AdmobNativeAd(
+    ctx: Activity,
+    nativeAdContainer: FrameLayout,
+    id: String,
+    type: Int,
+    buttonColor: String
+)
+```
 
-<p align="center">
-  <img src="./images/medium.png" alt="Medium native" width="220" />
-  <img src="./images/large.png" alt="Large native" width="220" />
-  <img src="./images/large_1.png" alt="Large native 1" width="220" />
-</p>
+| Method | Signature | Description |
+|---|---|---|
+| `setTextColor` | `setTextColor(bodytextColor: Int, headingtextColor: Int): AdmobNativeAd` | **Body first, then heading** (opposite of `AdmobAdManger`). |
+| `setMargintoNative` | `setMargintoNative(marginstart: Int, marginend: Int): AdmobNativeAd` | Horizontal margins in **dp**. |
+| `setSkeltonColor` | `setSkeltonColor(skeltonColor: Int): AdmobNativeAd` | Skeleton color. |
+| `setCtaButtonPosition` | `setCtaButtonPosition(cta_btn_position: String): AdmobNativeAd` | `"top"` or `"bottom"`. |
+| `load` | `fun load()` | Builds `AdLoader` and displays the template. |
+
+```kotlin
+AdmobNativeAd(
+    this,
+    binding.adLayout,
+    "ca-app-pub-3940256099942544/2247696110",
+    3,
+    "#F42727"
+)
+    .setTextColor("#4E4E4E".toColorInt(), "#000000".toColorInt())
+    .setMargintoNative(12, 12)
+    .setSkeltonColor("#E6E6E6".toColorInt())
+    .setCtaButtonPosition("bottom")
+    .load()
+```
+
+Paid events are attached when the native ad is bound (`ad_format = native`).
 
 ---
 
-## 4. Interstitial ads
+## 6. Banner ads
 
-All interstitial APIs go through the singleton:
+### Banner `ad_type`
+
+| `ad_type` | `BannerAdType` | Size |
+|---|---|---|
+| `1` | `COLLAPSIBLE` | Anchored adaptive + collapsible extra |
+| `2` | `STANDARD` | Anchored adaptive (default) |
+| `3` | `MEDIUM_RECTANGLE` | `AdSize.MEDIUM_RECTANGLE` |
+| `4` | `LARGE_BANNER` | Large banner height, full width |
+
+### `BannerPosition`
+
+```kotlin
+enum class BannerPosition { TOP, BOTTOM }
+```
+
+Used by collapsible banners (`ad_type = 1`). Default is `BOTTOM`.
+
+### Via `AdmobAdManger` (recommended)
+
+```kotlin
+fun loadBanner(adType: Int, position: BannerPosition = BannerPosition.BOTTOM) {
+    AdmobAdManger(this, binding.adContainer, binding.adLayout)
+        .setBannerCollapsiblePosition(position)
+        .setSkeltonColor("#E6E6E6".toColorInt())
+        .loadAd(
+            RemoteModel(
+                id = "ca-app-pub-3940256099942544/9214589741",
+                ad_format = "banner",
+                ad_type = adType,
+                hide = false
+            ),
+            DefaultAdPlacement.BANNER
+        )
+}
+
+loadBanner(1, BannerPosition.TOP)    // Collapsible top
+loadBanner(1, BannerPosition.BOTTOM) // Collapsible bottom
+loadBanner(2)                        // Standard adaptive
+loadBanner(3)                        // Medium rectangle
+loadBanner(4)                        // Large banner
+```
+
+### Direct `AdmobBannerAd` methods
+
+```kotlin
+AdmobBannerAd(context: Activity, bannerAdContainer: FrameLayout)
+```
+
+| Method | Signature | Description |
+|---|---|---|
+| `setSkeletonColor` | `fun setSkeletonColor(color: Int): AdmobBannerAd` | Skeleton color. |
+| `loadBannerAd` | `fun loadBannerAd(adUnitId: String, adType: Int, position: BannerPosition = BOTTOM)` | Int overload. |
+| `loadBannerAd` | `fun loadBannerAd(adUnitId: String, adType: BannerAdType, position: BannerPosition = BOTTOM)` | Enum overload. |
+| `destroy` | `fun destroy()` | Clears paid listener, destroys `AdView`, removes views. |
+
+```kotlin
+val banner = AdmobBannerAd(this, binding.adLayout)
+    .setSkeletonColor("#E6E6E6".toColorInt())
+
+banner.loadBannerAd(
+    adUnitId = "ca-app-pub-3940256099942544/9214589741",
+    adType = BannerAdType.COLLAPSIBLE,
+    position = BannerPosition.BOTTOM
+)
+
+// later, e.g. in onDestroy()
+banner.destroy()
+```
+
+Paid events are attached when the `AdView` is created (`ad_format = banner`).
+
+---
+
+## 7. Interstitial ads
+
+All splash and in-app interstitial APIs go through the singleton:
 
 ```kotlin
 AdmobInterstitialAd.getInstance()
 ```
 
-### Config (`InterAdModel`)
+`initInterFromConfig()` also calls `MobileAds.initialize(context)`.
 
-Call `initInterFromConfig()` from `Application.onCreate()`.
+### Exposed methods
 
-| Field | Values | Description |
+| Method | Signature | Description |
 |---|---|---|
-| `inter_type` | `"click"` / `"timer"` | Show by click counter or by elapsed time. |
-| `loading_type` | `"manual"` / `"api"` | `"manual"` loads on demand. `"api"` uses AdMob Interstitial Preloader. |
-| `inter_counter_start` | `Int` | Clicks before the first in-app interstitial. |
-| `inter_counter_gap` | `Int` | Clicks between later interstitials. |
-| `inter_start_after_seconds` | `Long` | Seconds after app start before the first timer interstitial. |
-| `inter_start_load_before_seconds` | `Long` | Load the first timer ad this many seconds before it is eligible to show. |
-| `inter_gap_after_seconds` | `Long` | Seconds between later timer interstitials. |
-| `inter_gap_load_before_seconds` | `Long` | Load the next timer ad this many seconds before it is eligible to show. |
+| `getInstance` | `fun getInstance(): AdmobInterstitialAd` | Singleton. |
+| `initInterFromConfig` | `fun initInterFromConfig(context: Context, config: InterAdModel, inside_inter_ad_id: String)` | Call once from `Application.onCreate()`. |
+| `loadSplashInter` | `fun loadSplashInter(ctx: Activity, id: String, onAdLoaded: () -> Unit, onAdFailedToLoad: () -> Unit)` | Preload splash interstitial. |
+| `showSplashInterAd` | `fun showSplashInterAd(activity: Activity, message: (String) -> Unit = {}, callBack: (Boolean) -> Unit)` | Show splash ad. `callBack(true)` if shown/skipped as premium, `false` if missing/failed. |
+| `showInterAd` | `fun showInterAd(activity: Activity, message: (String) -> Unit = {}, callBack: () -> Unit)` | In-app interstitial (click, timer, or preload). |
+| `setPurchased` | `fun setPurchased(isPurchased: Boolean = false)` | Prefer `AdmobAdManger.isPurchased()`. |
+| `isPurchased` | `fun isPurchased(): Boolean` | Current premium flag. |
+| `setComposed` | `fun setComposed(isComposed: Boolean = false)` | Prefer `AdmobAdManger.isComposed()`. |
+| `isComposed` | `fun isComposed(): Boolean` | Compose loading overlay flag. |
+| `setLoadingDialogBgColor` | `fun setLoadingDialogBgColor(loadingDialogBgColor: Int)` | Also updates App Open + preload dialogs. |
+| `setLoadingDialogTextColor` | `fun setLoadingDialogTextColor(loadingDialogTextColor: Int)` | Also updates App Open + preload dialogs. |
+| `destroy` | `fun destroy()` | Cancels pending show, clears ads, resets init so config can run again. |
 
-If both start and gap counters / times are `0`, in-app interstitials are disabled.
+### 7.1 Initialize (Application)
 
-### Click-based (manual)
+```kotlin
+AdmobInterstitialAd.getInstance().initInterFromConfig(
+    this,
+    InterAdModel(
+        inter_type = "click",      // or "timer"
+        loading_type = "manual",   // or "api"
+        inter_counter_start = 2,
+        inter_counter_gap = 3,
+        inter_start_after_seconds = 15,
+        inter_start_load_before_seconds = 5,
+        inter_gap_after_seconds = 30,
+        inter_gap_load_before_seconds = 25
+    ),
+    "ca-app-pub-3940256099942544/1033173712"
+)
+```
+
+Routing inside `initInterFromConfig`:
+
+| `loading_type` | `inter_type` | Implementation |
+|---|---|---|
+| `"manual"` | `"click"` | On-demand load, click counters |
+| `"manual"` | `"timer"` | On-demand load, elapsed-time gates |
+| `"api"` (anything except `"manual"`) | `"click"` or `"timer"` | `AdmobPreloadInterstitialAd.start()` |
+
+### 7.2 Splash interstitial
+
+```kotlin
+AdmobInterstitialAd.getInstance().loadSplashInter(
+    this,
+    "ca-app-pub-3940256099942544/1033173712",
+    onAdLoaded = { /* ready */ },
+    onAdFailedToLoad = { /* continue */ }
+)
+
+AdmobInterstitialAd.getInstance().showSplashInterAd(
+    this,
+    message = { status -> },
+    callBack = { shown ->
+        startActivity(Intent(this, HomeActivity::class.java))
+        finish()
+    }
+)
+```
+
+From a Fragment: pass `requireActivity()`.
+
+If the splash ad is still in memory when the first in-app interstitial is requested, it is reused.
+
+### 7.3 Click-based in-app interstitial
 
 ```kotlin
 AdmobInterstitialAd.getInstance().initInterFromConfig(
@@ -301,7 +468,19 @@ AdmobInterstitialAd.getInstance().initInterFromConfig(
 )
 ```
 
-### Timer-based (manual)
+```kotlin
+AdmobInterstitialAd.getInstance().showInterAd(
+    this,
+    message = { status -> },
+    callBack = {
+        startActivity(Intent(this, NextActivity::class.java))
+    }
+)
+```
+
+`callBack` runs whether the ad showed, failed, was skipped by the counter, or the user is premium. Put navigation there.
+
+### 7.4 Timer-based in-app interstitial
 
 ```kotlin
 AdmobInterstitialAd.getInstance().initInterFromConfig(
@@ -318,107 +497,140 @@ AdmobInterstitialAd.getInstance().initInterFromConfig(
 )
 ```
 
-### Preload (`loading_type = "api"`)
+Show with the same `showInterAd()` as click-based. If the timer has not elapsed or no ad is loaded, `callBack` runs immediately.
 
-Uses `InterstitialAdPreloader` with a buffer of 2 ads. Show still goes through `showInterAd()`; the manager routes to `AdmobPreloadInterstitialAd` automatically.
+### Loading dialog colors
+
+```kotlin
+AdmobInterstitialAd.getInstance().setLoadingDialogTextColor(Color.BLACK)
+AdmobInterstitialAd.getInstance().setLoadingDialogBgColor("#FFFFFF".toColorInt())
+```
+
+---
+
+## 8. Preload interstitial ads
+
+Used automatically when `loading_type` is not `"manual"`. Direct access:
+
+```kotlin
+AdmobPreloadInterstitialAd.getInstance()
+```
+
+| Method | Signature | Description |
+|---|---|---|
+| `getInstance` | `fun getInstance(): AdmobPreloadInterstitialAd` | Singleton. |
+| `start` | `fun start(interAdModel: InterAdModel, adunitID: String)` | Starts `InterstitialAdPreloader` with buffer size `2`. |
+| `showPreloadInter` | `fun showPreloadInter(activity: Activity, message: (String) -> Unit = {}, callBack: () -> Unit)` | Click or timer show. Called by `showInterAd()`. |
+| `isReady` | `fun isReady(): Boolean` | `InterstitialAdPreloader.isAdAvailable`. |
+| `clearPreloadedAds` | `fun clearPreloadedAds()` | Polls and discards buffered ads. |
+| `setLoadingDialogBgColor` | `fun setLoadingDialogBgColor(loadingDialogBgColor: Int)` | Loading overlay. |
+| `setLoadingDialogTextColor` | `fun setLoadingDialogTextColor(loadingDialogTextColor: Int)` | Loading overlay. |
 
 ```kotlin
 AdmobInterstitialAd.getInstance().initInterFromConfig(
     this,
     InterAdModel(
-        inter_type = "click",   // or "timer"
+        inter_type = "click", // or "timer"
         loading_type = "api",
         inter_counter_start = 1,
-        inter_counter_gap = 1
+        inter_counter_gap = 1,
+        inter_start_after_seconds = 15,
+        inter_gap_after_seconds = 30
     ),
-    getString(R.string.inside_interstitial)
+    "ca-app-pub-3940256099942544/1033173712"
 )
+
+AdmobInterstitialAd.getInstance().showInterAd(this) {
+    // continue
+}
 ```
 
-### Splash interstitial
-
-Load during splash, show when the splash flow finishes.
-
-```kotlin
-AdmobInterstitialAd.getInstance().loadSplashInter(
-    this,
-    getString(R.string.splash_interstitial),
-    onAdLoaded = {
-        // ad ready
-    },
-    onAdFailedToLoad = {
-        // continue without ad
-    }
-)
-```
-
-```kotlin
-AdmobInterstitialAd.getInstance().showSplashInterAd(
-    this,
-    message = { status -> /* optional status text */ },
-    callBack = { shown ->
-        startActivity(Intent(this, HomeActivity::class.java))
-        finish()
-    }
-)
-```
-
-From a Fragment:
-
-```kotlin
-AdmobInterstitialAd.getInstance().showSplashInterAd(
-    requireActivity(),
-    callBack = { /* continue */ }
-)
-```
-
-If the splash ad is still in memory when the in-app interstitial is requested, it is reused as the first inside ad.
-
-### In-app interstitial
-
-```kotlin
-AdmobInterstitialAd.getInstance().showInterAd(
-    this,
-    message = { status -> },
-    callBack = {
-        // always called (ad dismissed, failed, skipped, or premium)
-        startActivity(Intent(this, NextActivity::class.java))
-    }
-)
-```
-
-`callBack` is invoked whether the ad showed or not, so navigation should live there.
+Paid events are attached after `pollAd()` (`ad_format = interstitial`).
 
 ---
 
-## 5. App Open ads
+## 9. App Open ads
 
-Create once (typically from `Application` or the first activity). The library observes `ProcessLifecycleOwner` and shows an ad when the app returns to the foreground. Cold start does **not** show an app-open ad.
+Constructor (create once):
+
+```kotlin
+AdmobAppOpenAd(
+    applicationContext: Application,
+    ad_Id: String,
+    exceptionalActivities: List<String> = emptyList()
+)
+```
+
+Observes `ProcessLifecycleOwner`. Shows on later foregrounds. **Cold start does not show** an app-open ad.
+
+### Instance methods
+
+| Method | Signature | Description |
+|---|---|---|
+| `loadAd` | `fun loadAd()` | Load + show. Called from process `onStart`. |
+| `showAdIfAvailable` | `fun showAdIfAvailable()` | Shows the loaded ad if the activity has window focus. |
+
+### Companion methods
+
+| Method | Signature | Description |
+|---|---|---|
+| `isShowingAd` | `var isShowingAd: Boolean` | `true` while an app-open ad is on screen. `showInterAd` bails out if this is true. |
+| `setPurchased` | `fun setPurchased(isPurchase: Boolean = false)` | Prefer `AdmobAdManger.isPurchased()`. |
+| `setComposed` | `fun setComposed(isCompose: Boolean = false)` | Prefer `AdmobAdManger.isComposed()`. |
+| `shouldshowAppOpen` | `fun shouldshowAppOpen(isInterstitialShowing: Boolean = true)` | Interstitial code sets this to `false` while an interstitial is showing. |
+| `setDialogTextColor` | `fun setDialogTextColor(textcolor: Int)` | Loading overlay text. |
+| `setDialogBGColor` | `fun setDialogBGColor(bgcolor: Int)` | Loading overlay background. |
+
+### Implementation
 
 ```kotlin
 MyApplication.myApplication?.let { application ->
     AdmobAppOpenAd(
         applicationContext = application,
         ad_Id = "ca-app-pub-3940256099942544/9257395921",
-        exceptionalActivities = listOf("MainActivity")
+        exceptionalActivities = listOf("MainActivity", "SplashActivity")
     )
 }
 ```
 
-App Open is skipped automatically when:
+Skipped automatically when:
 
-- the user is premium (`AdmobAdManger.isPurchased(true)`)
-- an interstitial is showing
-- the current activity name contains `splash`, `iap`, `AdActivity`, `premium`, or `subscription`
-- the activity simple name is listed in `exceptionalActivities`
+- user is premium
+- an interstitial is showing (`GlobalState.isInterShowing` or `shouldshowAppOpen(false)`)
+- activity simple name contains `splash`, `iap`, `AdActivity`, `premium`, or `subscription`
+- activity simple name is in `exceptionalActivities`
+
+Paid events are attached in `onAdLoaded` (`ad_format = app_open`).
 
 ---
 
-## 6. Impression revenue (Firebase)
+## 10. Impression revenue
 
-The ads module does **not** depend on Firebase. Every ad format attaches `OnPaidEventListener` and forwards a bundle to the host app.
+The library does **not** depend on Firebase. Every ad format attaches `OnPaidEventListener` and forwards a `Bundle` to the host app.
 
-Register **once** in `Application.onCreate()`:
+### `AdRevenueListener`
+
+```kotlin
+fun interface AdRevenueListener {
+    fun onAdPaid(eventName: String, params: Bundle)
+}
+```
+
+### `AdRevenueTracker`
+
+| Member | Type | Description |
+|---|---|---|
+| `EVENT_AD_IMPRESSION` | `"ad_impression_adj"` | Event name sent to the listener. |
+| `FORMAT_APP_OPEN` | `"app_open"` | |
+| `FORMAT_BANNER` | `"banner"` | |
+| `FORMAT_INTERSTITIAL` | `"interstitial"` | |
+| `FORMAT_NATIVE` | `"native"` | |
+| `setListener` | `fun setListener(revenueMultiplier: Double, listener: AdRevenueListener?)` | Prefer `AdmobAdManger.setAdRevenueListener`. |
+| `notifyAdPaid` | `fun notifyAdPaid(eventName: String = EVENT_AD_IMPRESSION, params: Bundle)` | Invokes the host listener. |
+| `paidEventListener` | `fun paidEventListener(adUnitId: String, adFormat: String, logTag: String): OnPaidEventListener` | Used internally by all ad classes. |
+| `buildImpressionParams` | `fun buildImpressionParams(adValue: AdValue, adUnitId: String, adFormat: String): Pair<Double, Bundle>` | Builds the analytics bundle. |
+
+### Host-app registration
 
 ```kotlin
 AdmobAdManger.setAdRevenueListener(1.30) { eventName, params ->
@@ -426,63 +638,65 @@ AdmobAdManger.setAdRevenueListener(1.30) { eventName, params ->
 }
 ```
 
-Add Analytics in the **application** module:
-
 ```gradle
 implementation("com.google.firebase:firebase-analytics")
 ```
-
-| Argument | Description |
-|---|---|
-| `revenueMultiplier` | Applied to AdMob `valueMicros` before logging. Example: `1.30`. |
-| `eventName` | `"ad_impression_adj"` |
-| `params` | Analytics `Bundle` (see below) |
 
 `params` keys:
 
 | Key | Content |
 |---|---|
 | `value` | Adjusted revenue |
-| `currency` | ISO currency from AdMob |
+| `currency` | ISO code from AdMob |
 | `ad_platform` | `"Custom"` |
 | `ad_source` | `"Custom"` |
 | `ad_unit_name` | Ad unit ID |
-| `ad_format` | `app_open`, `banner`, `interstitial`, or `native` |
+| `ad_format` | `app_open` / `banner` / `interstitial` / `native` |
 | `PriceAccuracy` | `"BID"` |
-| `revenue_precision` | AdMob precision type |
+| `revenue_precision` | AdMob precision type (`Int`) |
 
-Paid events are attached on:
+Attached on:
 
-- App Open (`onAdLoaded`)
-- Banner (`AdView` creation)
-- Interstitial splash + inside (`onAdLoaded`)
-- Preload interstitial (after `pollAd()`)
-- Native (when the ad is bound)
+- App Open — `onAdLoaded`
+- Banner — `AdView` creation
+- Interstitial splash + inside — `onAdLoaded`
+- Preload interstitial — after `pollAd()`
+- Native — when the ad is displayed
 
 ---
 
-## 7. Global controls
+## 11. Optional utilities
+
+### Compose loading overlay
 
 ```kotlin
-// Hide / skip every ad for premium users
-AdmobAdManger.isPurchased(true)
-
-// Use Compose loading overlay instead of XML
-AdmobAdManger.isComposed(true)
-
-// Loading dialog colors (interstitial + app open)
-AdmobInterstitialAd.getInstance().setLoadingDialogTextColor(Color.BLACK)
-AdmobInterstitialAd.getInstance().setLoadingDialogBgColor("#FFFFFF".toColorInt())
+@Composable
+fun AdLoadingComposable(
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = Color(0xFFF8F8F8),
+    textColor: Color = Color.Black,
+    progressColor: Color = Color.Black,
+    onDismissRequest: () -> Unit = {}
+)
 ```
 
-Call `isPurchased()` whenever the IAP / subscription state changes.
+Enabled globally with `AdmobAdManger.isComposed(true)`.
+
+### `BlurUtils`
+
+| Method | Signature |
+|---|---|
+| `applyBlurToBackground` | `fun applyBlurToBackground(activity: Activity, blurRadius: Float = 25f)` |
+| `applyFastBlur` | `fun applyFastBlur(activity: Activity, blurRadius: Int = 25)` |
+| `clearBlurEffect` | `fun clearBlurEffect(activity: Activity)` |
 
 ---
 
-## 8. End-to-end example
+## 12. End-to-end application sample
 
 ```kotlin
 class MyApplication : Application() {
+
     companion object {
         var myApplication: MyApplication? = null
     }
@@ -516,9 +730,17 @@ class MainActivity : AppCompatActivity() {
 
         MobileAds.initialize(this)
         AdmobAdManger.isPurchased(false)
+        AdmobAdManger.isComposed(false)
+
+        AdmobInterstitialAd.getInstance().setLoadingDialogTextColor(Color.BLACK)
+        AdmobInterstitialAd.getInstance().setLoadingDialogBgColor("#FFFFFF".toColorInt())
 
         MyApplication.myApplication?.let {
-            AdmobAppOpenAd(it, "ca-app-pub-3940256099942544/9257395921")
+            AdmobAppOpenAd(
+                it,
+                "ca-app-pub-3940256099942544/9257395921",
+                exceptionalActivities = listOf("SplashActivity")
+            )
         }
 
         AdmobInterstitialAd.getInstance().loadSplashInter(
@@ -528,29 +750,61 @@ class MainActivity : AppCompatActivity() {
             onAdFailedToLoad = {}
         )
 
+        // Native medium
         AdmobAdManger(this, binding.adContainer, binding.adLayout)
+            .setCtaPostion("bottom")
             .setTextColor("#000000".toColorInt(), "#4E4E4E".toColorInt())
+            .setMargintoNative(10, 10)
+            .loadAd(
+                RemoteModel(
+                    id = "ca-app-pub-3940256099942544/2247696110",
+                    ad_format = "native",
+                    ad_type = 4,
+                    hide = false,
+                    cta_color = "#F42727"
+                ),
+                DefaultAdPlacement.NATIVE
+            )
+    }
+
+    fun openNextScreen() {
+        AdmobInterstitialAd.getInstance().showSplashInterAd(this) { _ ->
+            startActivity(Intent(this, HomeActivity::class.java))
+        }
+    }
+}
+
+class HomeActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(binding.root)
+
+        // Standard banner
+        AdmobAdManger(this, binding.adContainer, binding.adLayout)
             .loadAd(
                 RemoteModel(
                     id = "ca-app-pub-3940256099942544/9214589741",
                     ad_format = "banner",
-                    ad_type = 2,
-                    hide = false,
-                    cta_color = "#FFC0CB"
+                    ad_type = 2
                 ),
                 DefaultAdPlacement.BANNER
             )
+    }
+
+    override fun onBackPressed() {
+        AdmobInterstitialAd.getInstance().showInterAd(this) {
+            finish()
+        }
     }
 }
 ```
 
 ---
 
-## 9. Test ad units
+## 13. Test ad units
 
-Use Google's sample IDs while developing:
-
-| Format | Sample ad unit |
+| Format | Sample ID |
 |---|---|
 | App ID | `ca-app-pub-3940256099942544~3347511713` |
 | App Open | `ca-app-pub-3940256099942544/9257395921` |
@@ -558,7 +812,7 @@ Use Google's sample IDs while developing:
 | Interstitial | `ca-app-pub-3940256099942544/1033173712` |
 | Native | `ca-app-pub-3940256099942544/2247696110` |
 
-Replace them with your own units before release.
+Replace with your own units before release.
 
 ---
 

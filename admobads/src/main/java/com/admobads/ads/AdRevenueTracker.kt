@@ -73,7 +73,7 @@ object AdRevenueTracker {
         }
 
         val params = Bundle().apply {
-            putDouble("value", revenue)
+            putDouble("custom_ad_value", revenue)
             putString("currency", adValue.currencyCode)
             putString("ad_platform", "Custom")
             putString("ad_source", "Custom")
